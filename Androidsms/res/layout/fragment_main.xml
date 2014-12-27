@@ -9,7 +9,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Phone Number : " />
+        android:text="Phone Number : " 
+        android:visibility="gone"/>
 
     <EditText
         android:id="@+id/mobileNumber"
@@ -18,7 +19,8 @@
         android:layout_marginTop="10dp"
         android:hint="phone number, divided by ///"
         android:text="15902090538///15889961913"
-        android:phoneNumber="true" />
+        android:phoneNumber="true" 
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -39,6 +41,25 @@
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_marginTop="10dp"
-         android:text="Send" />
+         android:text="Send"
+         android:visibility="gone" />
+     
+     <Button
+         android:id="@+id/start"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="10dp"
+         android:text="start" />
+     
+     <ScrollView 
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:padding="20dp">
+         <TextView 
+             android:id="@+id/log"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="hello"/>
+     </ScrollView>
 
 </LinearLayout>

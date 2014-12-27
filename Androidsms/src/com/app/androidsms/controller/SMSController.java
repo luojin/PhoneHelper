@@ -55,7 +55,7 @@ public class SMSController {
 		if( phoneNumber==null|| phoneNumber.length==0 || msg==null || msg.trim().length()==0) 
 		{
 			Log.i(TAG, "sendSMSMulti value empty"); 
-			mSendTaskDone.OnSendTaskDone();
+			mSendTaskDone.OnSendTaskDone(null);
 			return; 
 		}
 		
@@ -70,7 +70,7 @@ public class SMSController {
 		if( phoneNumber==null || "".equals( phoneNumber) || "".equals(message) ) 
 		{
 			Log.i(TAG, "sendSMS value empty"); 
-			mSendTaskDone.OnSendTaskDone();
+			mSendTaskDone.OnSendTaskDone(null);
 			return;
 		}
 		
@@ -91,8 +91,8 @@ public class SMSController {
 					if( sendIndex<name.length)
 						sendSMS(name[sendIndex],  message);
 					else{
+						mSendTaskDone.OnSendTaskDone(name);
 						setValue(0,null,null);
-						mSendTaskDone.OnSendTaskDone();
 					}
 					
 					switch (getResultCode())
@@ -163,12 +163,13 @@ public class SMSController {
 	}
 	
 	/**
-	 * send finish callback
+	 * send task finish will callback this function
+	 * args: sent name list, String[]
 	 * @author luo-PC
 	 *
 	 */
 	public interface SendTaskDone{
-		public void OnSendTaskDone();
+		public void OnSendTaskDone(String []SentNameList);
 	}
 
 }
