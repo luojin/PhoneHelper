@@ -8,6 +8,8 @@ import com.app.androidsms.controller.SMSController.SendTaskDone;
 import com.app.androidsms.custom.widgets.CircleButton;
 
 import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 	
+	private final static int SCANNIN_GREQUEST_CODE = 1;
 	private Button send;
 	private CircleButton controlBtn;
 	private TextView logTV, controlBtnTV;
@@ -86,18 +89,22 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if( mPhoneController.isMonitoring())
-				{
-					mPhoneController.setMonitoring(false);
-					controlBtnTV.setText("start");controlBtn.setColor( getResources().getColor(R.color.control_btn_stop));
-					setLogger("stop monitor");
-				}
-				else
-				{
-					mPhoneController.setMonitoring(true);
-					controlBtnTV.setText("stop");controlBtn.setColor( getResources().getColor(R.color.control_btn_start));
-					setLogger("start monitor");
-				}
+//				if( mPhoneController.isMonitoring())
+//				{
+//					mPhoneController.setMonitoring(false);
+//					controlBtnTV.setText("start");controlBtn.setColor( getResources().getColor(R.color.control_btn_stop));
+//					setLogger("stop monitor");
+//				}
+//				else
+//				{
+//					mPhoneController.setMonitoring(true);
+//					controlBtnTV.setText("stop");controlBtn.setColor( getResources().getColor(R.color.control_btn_start));
+//					setLogger("start monitor");
+//				}
+				Intent intent = new Intent();
+				intent.setClass(MainActivity.this, MipcaActivityCapture.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
 			}
 		});
 
@@ -143,4 +150,21 @@ public class MainActivity extends ActionBarActivity {
 		mSMSController.unregisterSMSReceiver();
 		mProfilesController.stopVibrator();
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+		case SCANNIN_GREQUEST_CODE:
+			if(resultCode == RESULT_OK){
+				Bundle bundle = data.getExtras();
+				//显示扫描到的内容
+				//mTextView.setText(bundle.getString("result"));
+				setLogger(bundle.getString("result") );
+				//显示
+				//mImageView.setImageBitmap((Bitmap) data.getParcelableExtra("bitmap"));
+			}
+			break;
+		}
+    }	
 }
