@@ -10,6 +10,11 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * ¿ØÖÆ¶ÌÐÅ·¢ËÍ
+ * @author luo-PC
+ *
+ */
 public class SMSController {
 	private static String TAG = SMSController.class.getSimpleName();
 	private Context mContext;

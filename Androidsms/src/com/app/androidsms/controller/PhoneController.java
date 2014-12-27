@@ -9,6 +9,11 @@ import android.os.RemoteException;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
+/**
+ * 控制来电拦截与否
+ * @author luo-PC
+ *
+ */
 public class PhoneController {
 	private static String TAG = PhoneController.class.getSimpleName();
 	private static PhoneController sInstance;
@@ -17,7 +22,7 @@ public class PhoneController {
     private PhoneStateListener 	phoneListener 		= null;
     private ITelephony 				iTelephony 			= null;
     private TelephonyManager 	telephonyManager 	= null;  
-    private OnEndCall					mOnEndCall			= null;
+    private OnCallChange				mOnCallChange		= null;
 	
 	public static synchronized PhoneController get(Context cxt) {
         if (sInstance == null) 
@@ -50,18 +55,29 @@ public class PhoneController {
     	{
 	    	phoneListener = new PhoneStateListener(){  
 	            @Override  
-	            public void onCallStateChanged(int state,String inComingNumber)
+	            public void onCallStateChanged(int state,String number)
 	            {  
-	                if(isMonitoring && state == TelephonyManager.CALL_STATE_RINGING )
-	                {  
-	                	try {
-							iTelephony.endCall();
-							whenEndCall(inComingNumber);
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-	                }  
+	            	if( !isMonitoring) return;
+	            	
+	            	switch(state){
+	            	//the calling is coming
+		            	case TelephonyManager.CALL_STATE_RINGING:
+//		            		try {
+//								iTelephony.endCall();
+								whenComingCall(number);
+//							} catch (RemoteException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+		            		break;
+		            //the calling is ended
+		            	case TelephonyManager.CALL_STATE_IDLE:
+		            		mOnCallChange.OnCallOffhook(number);
+		            		break;
+	            		default:
+	            			break;
+	            	}
+	                
 	            }  
 	        };  
     	}
@@ -77,22 +93,23 @@ public class PhoneController {
 		this.isMonitoring = isMonitoring;
 	}
 	
-	public void setmOnEndCall(OnEndCall mOnEndCall) {
-		this.mOnEndCall = mOnEndCall;
+	public void setmOnEndCall(OnCallChange mOnEndCall) {
+		this.mOnCallChange = mOnEndCall;
 	}
 	
-	private void whenEndCall(String inComingNumber)
+	private void whenComingCall(String inComingNumber)
 	{
-		if( mOnEndCall!=null)
-			mOnEndCall.OnEndCall(inComingNumber);
+		if( mOnCallChange!=null)
+			mOnCallChange.OnComingCall(inComingNumber);
 	}
 
 	/**
 	 * IsMonitoring && Phone call Intercepted will trigger this callback function
 	 * @author luo-PC
 	 */
-	public interface OnEndCall{
-		public void OnEndCall(String inComingNumber);
+	public interface OnCallChange{
+		public void OnComingCall(String inComingNumber);
+		public void OnCallOffhook(String offhookNumber);
 	}
 	
 }

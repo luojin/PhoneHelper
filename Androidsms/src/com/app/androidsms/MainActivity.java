@@ -1,7 +1,8 @@
 package com.app.androidsms;
 
 import com.app.androidsms.controller.PhoneController;
-import com.app.androidsms.controller.PhoneController.OnEndCall;
+import com.app.androidsms.controller.PhoneController.OnCallChange;
+import com.app.androidsms.controller.ProfilesController;
 import com.app.androidsms.controller.SMSController;
 import com.app.androidsms.controller.SMSController.SendTaskDone;
 import com.app.androidsms.custom.widgets.CircleButton;
@@ -24,6 +25,7 @@ public class MainActivity extends ActionBarActivity {
 	private EditText phoneNo, messageBody;
 	private SMSController mSMSController;
 	private PhoneController mPhoneController;
+	private ProfilesController mProfilesController;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,21 +50,32 @@ public class MainActivity extends ActionBarActivity {
 		});
 		
 		mPhoneController = PhoneController.get(getApplicationContext());
-		mPhoneController.setmOnEndCall(new OnEndCall() {
-			
+		mProfilesController = ProfilesController.get(getApplicationContext());
+		mPhoneController.setmOnEndCall(new OnCallChange() {
 			@Override
-			public void OnEndCall(String inComingNumber) {
+			public void OnComingCall(String inComingNumber) {
 				// TODO Auto-generated method stub
-				setLogger(inComingNumber+" Intercepted");
-				
-				String sms =  messageBody.getText().toString();
-				sms = (sms==null || sms.trim().length()==0) ? "i will call you later" :sms;
-				if( inComingNumber!=null && inComingNumber.trim().length()!=0)
-				{
-					String []nameList = inComingNumber.split("///");
-					mSMSController.sendSMSMulti(nameList, sms);
-					setLogger( "begin send msg to: "+inComingNumber);
-				}
+//				setLogger(inComingNumber+" Intercepted");
+//				
+//				String sms =  messageBody.getText().toString();
+//				sms = (sms==null || sms.trim().length()==0) ? "i will call you later" :sms;
+//				if( inComingNumber!=null && inComingNumber.trim().length()!=0)
+//				{
+//					String []nameList = inComingNumber.split("///");
+//					mSMSController.sendSMSMulti(nameList, sms);
+//					setLogger( "begin send msg to: "+inComingNumber);
+//				}
+				setLogger(" start vibrator");
+				mProfilesController.startVibrator();
+				mProfilesController.setVolume(100);
+			}
+
+			@Override
+			public void OnCallOffhook(String offhookNumber) {
+				// TODO Auto-generated method stub
+				setLogger(" stop vibrator");
+				mProfilesController.stopVibrator();
+				mProfilesController.setVolume(0);
 			}
 		});
 		
@@ -128,5 +141,6 @@ public class MainActivity extends ActionBarActivity {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		mSMSController.unregisterSMSReceiver();
+		mProfilesController.stopVibrator();
 	}
 }
