@@ -4,8 +4,10 @@ import com.app.androidsms.controller.PhoneController;
 import com.app.androidsms.controller.PhoneController.OnEndCall;
 import com.app.androidsms.controller.SMSController;
 import com.app.androidsms.controller.SMSController.SendTaskDone;
+import com.app.androidsms.custom.widgets.CircleButton;
 
 import android.support.v7.app.ActionBarActivity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,8 +18,9 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 	
-	private Button send, controlBtn;
-	private TextView logTV;
+	private Button send;
+	private CircleButton controlBtn;
+	private TextView logTV, controlBtnTV;
 	private EditText phoneNo, messageBody;
 	private SMSController mSMSController;
 	private PhoneController mPhoneController;
@@ -63,7 +66,8 @@ public class MainActivity extends ActionBarActivity {
 			}
 		});
 		
-		controlBtn = (Button) findViewById(R.id.start);
+		controlBtn = (CircleButton) findViewById(R.id.controlbtn);
+		controlBtnTV = (TextView) findViewById(R.id.controlbtnTV);
 		controlBtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -72,13 +76,13 @@ public class MainActivity extends ActionBarActivity {
 				if( mPhoneController.isMonitoring())
 				{
 					mPhoneController.setMonitoring(false);
-					controlBtn.setText("start");
+					controlBtnTV.setText("start");controlBtn.setColor( getResources().getColor(R.color.control_btn_stop));
 					setLogger("stop monitor");
 				}
 				else
 				{
 					mPhoneController.setMonitoring(true);
-					controlBtn.setText("stop");
+					controlBtnTV.setText("stop");controlBtn.setColor( getResources().getColor(R.color.control_btn_start));
 					setLogger("start monitor");
 				}
 			}

@@ -1,5 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linearLayout1"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
@@ -22,18 +22,13 @@
         android:phoneNumber="true" 
         android:visibility="gone"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Message Body: " />
-
     <EditText
         android:id="@+id/smsBody"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:hint="Enter message body"
+        android:hint="Auto Send Message Content"
+        android:textSize="15sp"
         android:inputType="textMultiLine"/>
 
      <Button
@@ -44,12 +39,24 @@
          android:text="Send"
          android:visibility="gone" />
      
-     <Button
-         android:id="@+id/start"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="10dp"
-         android:text="start" />
+     <RelativeLayout 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp">
+            <com.app.androidsms.custom.widgets.CircleButton
+	            android:id="@+id/controlbtn"
+	            android:layout_width="match_parent"
+	            android:layout_height="200dp"
+	            app:cb_color="@color/control_btn_stop" />
+            <TextView 
+                android:id="@+id/controlbtnTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="start"
+                android:textSize="50sp"
+                android:textColor="#ffffff"/>
+        </RelativeLayout>
      
      <ScrollView 
          android:layout_width="match_parent"
@@ -59,7 +66,7 @@
              android:id="@+id/log"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-             android:text="hello"/>
+             android:text="log:"/>
      </ScrollView>
 
 </LinearLayout>
