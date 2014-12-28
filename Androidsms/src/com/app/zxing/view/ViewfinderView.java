@@ -79,11 +79,11 @@ public final class ViewfinderView extends View {
 	/**
 	 * 字体大小
 	 */
-	private static final int TEXT_SIZE = 16;
+	private static final int TEXT_SIZE = 15;
 	/**
 	 * 字体距离扫描框下面的距离
 	 */
-	private static final int TEXT_PADDING_TOP = 30;
+	private static final int TEXT_PADDING_TOP = 40;
 	
 	/**
 	 * 画笔对象的引用
@@ -202,8 +202,8 @@ public final class ViewfinderView extends View {
         	//画扫描框下面的字
             paint.setColor(Color.WHITE);    
             paint.setTextSize(TEXT_SIZE * density);    
-            paint.setAlpha(0x40);    
-            paint.setTypeface(Typeface.create("System", Typeface.BOLD));   
+//            paint.setAlpha(0x40);    
+//            paint.setTypeface(Typeface.create("System", Typeface.BOLD));   
             String text = getResources().getString(R.string.scan_text);  
             float textWidth = paint.measureText(text);  
               

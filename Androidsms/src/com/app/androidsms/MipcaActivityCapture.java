@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
@@ -14,21 +17,28 @@ import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.app.androidsms.util.ImageUtil;
 import com.app.zxing.camera.CameraManager;
 import com.app.zxing.decoding.CaptureActivityHandler;
 import com.app.zxing.decoding.InactivityTimer;
@@ -43,7 +53,7 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
-public class MipcaActivityCapture extends Activity implements Callback , View.OnClickListener{
+public class MipcaActivityCapture extends Activity implements Callback{
 
 	private CaptureActivityHandler handler;
 	private ViewfinderView viewfinderView;
@@ -60,7 +70,6 @@ public class MipcaActivityCapture extends Activity implements Callback , View.On
 	private static final int REQUEST_CODE = 100;
 	private static final int PARSE_BARCODE_SUC = 300;
 	private static final int PARSE_BARCODE_FAIL = 303;
-	private ProgressDialog mProgress;
 	private String photo_path;
 	private Bitmap scanBitmap;
 
@@ -73,32 +82,10 @@ public class MipcaActivityCapture extends Activity implements Callback , View.On
 		CameraManager.init(getApplication());
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		
-		Button mButtonBack = (Button) findViewById(R.id.button_back);
-		mButtonBack.setOnClickListener(this);
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
 		
-		ImageButton mImageButton = (ImageButton) findViewById(R.id.button_function);
-		mImageButton.setOnClickListener(this);
 	}
-	
-	
-	@Override
-	public void onClick(View v) {
-		switch(v.getId()){
-		case R.id.button_back:
-			this.finish();
-			break;
-		case R.id.button_function:
-			//打开手机中的相册
-			Intent innerIntent = new Intent(Intent.ACTION_GET_CONTENT); //"android.intent.action.GET_CONTENT"
-	        innerIntent.setType("image/*");
-	        Intent wrapperIntent = Intent.createChooser(innerIntent, "选择二维码图片");
-	        this.startActivityForResult(wrapperIntent, REQUEST_CODE);
-			break;
-		}
-	}
-	
 	
 	private Handler mHandler = new Handler(){
 
@@ -106,7 +93,6 @@ public class MipcaActivityCapture extends Activity implements Callback , View.On
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			
-			mProgress.dismiss();
 			switch (msg.what) {
 			case PARSE_BARCODE_SUC:
 				onResultHandler((String)msg.obj, scanBitmap);
@@ -128,17 +114,9 @@ public class MipcaActivityCapture extends Activity implements Callback , View.On
 			switch(requestCode){
 			case REQUEST_CODE:
 				//获取选中图片的路径
-				Cursor cursor = getContentResolver().query(data.getData(), null, null, null, null);
-				if (cursor.moveToFirst()) {
-					photo_path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-				}
-				cursor.close();
-				
-				mProgress = new ProgressDialog(MipcaActivityCapture.this);
-				mProgress.setMessage("正在扫描...");
-				mProgress.setCancelable(false);
-				mProgress.show();
-				
+				Uri uri = data.getData();
+				photo_path = ImageUtil.getPath(getApplicationContext(), uri);
+
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
@@ -162,7 +140,7 @@ public class MipcaActivityCapture extends Activity implements Callback , View.On
 			}
 		}
 	}
-	
+
 	/**
 	 * 扫描二维码图片的方法
 	 * @param path
@@ -364,6 +342,28 @@ public class MipcaActivityCapture extends Activity implements Callback , View.On
 			mediaPlayer.seekTo(0);
 		}
 	};
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
 
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.album_choose) {
+			Intent innerIntent = new Intent(Intent.ACTION_GET_CONTENT); //"android.intent.action.GET_CONTENT"
+	        innerIntent.setType("image/*");
+	        Intent wrapperIntent = Intent.createChooser(innerIntent, "选择二维码图片");
+	        this.startActivityForResult(wrapperIntent, REQUEST_CODE);
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
 }
