@@ -102,9 +102,10 @@ public class MainActivity extends ActionBarActivity {
 //					setLogger("start monitor");
 //				}
 				Intent intent = new Intent();
-				intent.setClass(MainActivity.this, MipcaActivityCapture.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
+				intent.setClass(MainActivity.this, MyQRCode.class);
+//				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//				startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
+				startActivity(intent);
 			}
 		});
 
