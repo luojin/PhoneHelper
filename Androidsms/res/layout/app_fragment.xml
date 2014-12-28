@@ -48,77 +48,89 @@
             android:textColor="#ffffff" />
     </RelativeLayout>
 
+    
     <com.app.androidsms.custom.widgets.MyRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#eeeeee" >
-        <RelativeLayout
-            android:id="@+id/rl_title"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="#009990" >
+	         
+	        <RelativeLayout
+	            android:id="@+id/rl_title"
+	            android:layout_width="match_parent"
+	            android:layout_height="55dp"
+	            android:background="#009990" >
+	
+	            <ImageView
+	                android:id="@+id/iv_icon"
+	                android:layout_width="42dp"
+	                android:layout_height="42dp"
+	                android:layout_centerVertical="true"
+	                android:layout_marginLeft="10dp"
+	                android:scaleType="centerCrop"
+	                android:src="@drawable/ic_launcher" />
+	
+	            <TextView
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_centerInParent="true"
+	                android:text="Main"
+	                android:textColor="#ffffff"
+	                android:textSize="20sp" />
+	        </RelativeLayout>
+	        
+	       <ScrollView 
+	         android:layout_width="match_parent"
+	         android:layout_height="match_parent"
+	         android:layout_below="@+id/rl_title">
+	            <RelativeLayout 
+	                android:layout_width="match_parent"
+	                android:layout_height="match_parent">
+	                
+	                <EditText
+				        android:id="@+id/smsBody"
+				        android:layout_width="fill_parent"
+				        android:layout_height="wrap_content"
+				        android:layout_marginTop="10dp"
+				        android:layout_marginLeft="10dp"
+				        android:layout_marginRight="10dp"
+				        android:layout_alignParentTop="true"
+				        android:hint="Auto Send Message Content"
+				        android:textSize="15sp"
+				        android:inputType="textMultiLine"/>
+	                
+	                <RelativeLayout 
+			            android:id="@+id/controlbtnblock"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:layout_below="@+id/smsBody"
+			            android:layout_centerInParent="true"
+			            android:layout_marginTop="30dp">
+			            <com.app.androidsms.custom.widgets.CircleButton
+				            android:id="@+id/controlbtn"
+				            android:layout_width="150dp"
+				            android:layout_height="150dp"
+				            app:cb_color="@color/control_btn_stop" />
+			            <TextView 
+			                android:id="@+id/controlbtnTV"
+			                android:layout_width="wrap_content"
+			                android:layout_height="wrap_content"
+			                android:layout_centerInParent="true"
+			                android:text="start"
+			                android:textSize="50sp"
+			                android:textColor="#ffffff"/>
+			        </RelativeLayout>
+			        
+			        <TextView 
+		             android:id="@+id/log"
+		              android:layout_below="@+id/controlbtnblock"
+		             android:layout_width="match_parent"
+		             android:layout_height="wrap_content"
+		             android:padding="20dp"
+		             android:text="log:"/>
+	                
+	            </RelativeLayout>
 
-            <ImageView
-                android:id="@+id/iv_icon"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="Main"
-                android:textColor="#ffffff"
-                android:textSize="20sp" />
-        </RelativeLayout>
-        
-        <RelativeLayout 
-            android:id="@+id/controlbtnblock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
-            <com.app.androidsms.custom.widgets.CircleButton
-	            android:id="@+id/controlbtn"
-	            android:layout_width="150dp"
-	            android:layout_height="150dp"
-	            app:cb_color="@color/control_btn_stop" />
-            <TextView 
-                android:id="@+id/controlbtnTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="start"
-                android:textSize="50sp"
-                android:textColor="#ffffff"/>
-        </RelativeLayout>
-        
-        <EditText
-	        android:id="@+id/smsBody"
-	        android:layout_above="@+id/controlbtnblock"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="10dp"
-	        android:layout_marginBottom="40dp"
-	        android:hint="Auto Send Message Content"
-	        android:textSize="15sp"
-	        android:inputType="textMultiLine"/>
-        
-        <ScrollView 
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:layout_below="@+id/controlbtnblock"
-         android:padding="20dp">
-         <TextView 
-             android:id="@+id/log"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:text="log:"/>
-     </ScrollView>
-
-    </com.app.androidsms.custom.widgets.MyRelativeLayout>
-
+	         </ScrollView>
+	    </com.app.androidsms.custom.widgets.MyRelativeLayout>
+ 	
 </com.app.androidsms.custom.widgets.DragLayout>

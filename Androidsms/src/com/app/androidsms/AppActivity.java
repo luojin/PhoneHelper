@@ -45,6 +45,7 @@ public class AppActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.app_fragment);
 		
 		initDragLayout();
@@ -72,7 +73,6 @@ public class AppActivity extends Activity{
 	}
 
 	private void initView() {
-		messageBody = (EditText) findViewById(R.id.smsBody);
 		
 		iv_icon = (ImageView) findViewById(R.id.iv_icon);
 		iv_icon.setOnClickListener(new OnClickListener() {
@@ -95,6 +95,7 @@ public class AppActivity extends Activity{
 			}
 		});
 		
+		messageBody = (EditText) findViewById(R.id.smsBody);
 		logTV = (TextView) findViewById(R.id.log);
 		
 		mSMSController = SMSController.get(getApplicationContext());
