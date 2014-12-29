@@ -5,10 +5,14 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.MenuItem;
 import android.widget.ImageView;
 
 public class MyQRCode extends ActionBarActivity{
@@ -19,6 +23,10 @@ public class MyQRCode extends ActionBarActivity{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_myqrcode);
+		
+		ActionBar actionBar = getSupportActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    actionBar.setTitle(R.string.my_qrcode_title);
 		
 		myqrcode = (ImageView) findViewById(R.id.myqrcode);
 		
@@ -82,5 +90,18 @@ public class MyQRCode extends ActionBarActivity{
 		finish();
 		overridePendingTransition(R.anim.zoom_in,
 			R.anim.slide_right_out);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		switch( item.getItemId() ){
+		case android.R.id.home: 
+				onBackPressed();
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

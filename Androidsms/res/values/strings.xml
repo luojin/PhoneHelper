@@ -5,6 +5,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     
+    <string name="my_qrcode_title">我的二维码</string>
+    <string name="scan_qrcode_title">扫一扫</string>
+    
     <string-array name="menu_array">
         <item>主页</item>
         <item>扫一扫</item>

@@ -4,38 +4,26 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.app.androidsms.util.ImageUtil;
@@ -53,7 +41,7 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
-public class MipcaActivityCapture extends Activity implements Callback{
+public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 
 	private CaptureActivityHandler handler;
 	private ViewfinderView viewfinderView;
@@ -84,6 +72,10 @@ public class MipcaActivityCapture extends Activity implements Callback{
 		
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
+		
+		ActionBar actionBar = getSupportActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    actionBar.setTitle(R.string.scan_qrcode_title);
 	}
 	
 	private Handler mHandler = new Handler(){
@@ -99,10 +91,8 @@ public class MipcaActivityCapture extends Activity implements Callback{
 			case PARSE_BARCODE_FAIL:
 				Toast.makeText(MipcaActivityCapture.this, (String)msg.obj, Toast.LENGTH_LONG).show();
 				break;
-
 			}
 		}
-		
 	};
 	
 
@@ -355,7 +345,7 @@ public class MipcaActivityCapture extends Activity implements Callback{
 	public boolean onCreateOptionsMenu(Menu menu) {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.qr_capture, menu);
 		return true;
 	}
 	
@@ -364,12 +354,17 @@ public class MipcaActivityCapture extends Activity implements Callback{
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.album_choose) {
-			Intent innerIntent = new Intent(Intent.ACTION_GET_CONTENT); //"android.intent.action.GET_CONTENT"
-	        innerIntent.setType("image/*");
-	        Intent wrapperIntent = Intent.createChooser(innerIntent, "Ñ¡Ôñ¶þÎ¬ÂëÍ¼Æ¬");
-	        this.startActivityForResult(wrapperIntent, REQUEST_CODE);
+		switch( item.getItemId() ){
+		case android.R.id.home: 
+				onBackPressed();
+			break;
+		case R.id.album_choose:
+				Intent innerIntent = new Intent(Intent.ACTION_GET_CONTENT); //"android.intent.action.GET_CONTENT"
+		        innerIntent.setType("image/*");
+		        Intent wrapperIntent = Intent.createChooser(innerIntent, "Ñ¡Ôñ¶þÎ¬ÂëÍ¼Æ¬");
+		        this.startActivityForResult(wrapperIntent, REQUEST_CODE);
+			break;
+			
 		}
 		return super.onOptionsItemSelected(item);
 	}
