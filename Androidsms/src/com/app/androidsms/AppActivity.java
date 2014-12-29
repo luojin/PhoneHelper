@@ -86,6 +86,13 @@ public class AppActivity extends Activity{
 						overridePendingTransition(
 								R.anim.slide_right_in, R.anim.zoom_out);
 						break;
+					case Constants.MULTISENDSMS:
+						Intent intent2 = new Intent();
+						intent2.setClass(AppActivity.this, ChooseContacts.class);
+						startActivity(intent2);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
+						break;
 					case Constants.SETTING:
 						break;
 					default:
