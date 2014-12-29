@@ -10,6 +10,7 @@ import com.app.androidsms.controller.SMSController.SendTaskDone;
 import com.app.androidsms.custom.widgets.CircleButton;
 import com.app.androidsms.custom.widgets.DragLayout;
 import com.app.androidsms.custom.widgets.DragLayout.DragListener;
+import com.app.androidsms.util.Constants;
 import com.nineoldandroids.view.ViewHelper;
 
 import android.app.Activity;
@@ -33,7 +34,7 @@ import android.widget.Toast;
 public class AppActivity extends Activity{
 	private DragLayout dl;
 	private ListView lv;
-	private ImageView iv_icon, iv_bottom;
+	private ImageView iv_icon;
 	private CircleButton controlBtn;
 	private TextView logTV, controlBtnTV;
 	private EditText messageBody;
@@ -41,6 +42,8 @@ public class AppActivity extends Activity{
 	private SMSController mSMSController;
 	private PhoneController mPhoneController;
 	private ProfilesController mProfilesController;
+	
+	private int mCurrentPosition = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +60,37 @@ public class AppActivity extends Activity{
 		dl.setDragListener(new DragListener() {
 			@Override
 			public void onOpen() {
-				lv.smoothScrollToPosition(new Random().nextInt(30));
+				//reset
+				mCurrentPosition = 0;
 			}
 
 			@Override
 			public void onClose() {
-				shake();
+				//do something
+				switch(mCurrentPosition){
+					case Constants.HOME:
+						shake();
+						break;
+					case Constants.SCAN:
+						Intent intent = new Intent();
+						intent.setClass(AppActivity.this, MipcaActivityCapture.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivityForResult(intent, Constants.SCANNIN_GREQUEST_CODE);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
+						break;
+					case Constants.QRCODE:
+						Intent intent1 = new Intent();
+						intent1.setClass(AppActivity.this, MyQRCode.class);
+						startActivity(intent1);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
+						break;
+					case Constants.SETTING:
+						break;
+					default:
+						break;
+				}
 			}
 
 			@Override
@@ -82,8 +110,6 @@ public class AppActivity extends Activity{
 			}
 		});
 		
-		iv_bottom = (ImageView) findViewById(R.id.iv_bottom);
-		
 		lv = (ListView) findViewById(R.id.lv);	
 		lv.setAdapter(new ArrayAdapter<String>(AppActivity.this,
 				R.layout.item_text, getResources().getStringArray(R.array.menu_array) ));
@@ -91,7 +117,9 @@ public class AppActivity extends Activity{
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
-				Toast.makeText(getApplicationContext(), "click " + position, Toast.LENGTH_SHORT).show();
+				dl.close();
+				//set position
+				mCurrentPosition = position;
 			}
 		});
 		
@@ -195,5 +223,22 @@ public class AppActivity extends Activity{
 			
 		logTV.setText( setText);
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+		case Constants.SCANNIN_GREQUEST_CODE:
+			if(resultCode == RESULT_OK){
+				Bundle bundle = data.getExtras();
+				//显示扫描到的内容
+				//mTextView.setText(bundle.getString("result"));
+				setLogger(bundle.getString("result") );
+				//显示
+				//mImageView.setImageBitmap((Bitmap) data.getParcelableExtra("bitmap"));
+			}
+			break;
+		}
+    }	
 
 }

@@ -84,7 +84,6 @@ public class MipcaActivityCapture extends Activity implements Callback{
 		
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
-		
 	}
 	
 	private Handler mHandler = new Handler(){
@@ -217,6 +216,15 @@ public class MipcaActivityCapture extends Activity implements Callback{
 	protected void onDestroy() {
 		inactivityTimer.shutdown();
 		super.onDestroy();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+		finish();
+		overridePendingTransition(R.anim.zoom_in,
+			R.anim.slide_right_out);
 	}
 	
 	/**
