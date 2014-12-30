@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.androidsms.MainActivity" >
+
+    <item
+        android:id="@+id/choose_to_send"
+        android:title="@string/choose_to_send"
+         android:orderInCategory="100"
+        app:showAsAction="always"/>
+    
+    <item 
+        android:id="@+id/multi_send"
+        android:title="@string/multi_send"
+        android:orderInCategory="200"
+        app:showAsAction="always"/>
+
+</menu>

@@ -41,7 +41,7 @@ public class ContactBean {
 		return desplayName;
 	}
 
-	public void setDesplayName(String desplayName) {
+	public void setDisplayName(String desplayName) {
 		this.desplayName = desplayName;
 	}
 

@@ -9,6 +9,7 @@ public class Constants {
 	public final static int QRCODE = 2;
 	public final static int MULTISENDSMS = 3;
 	public final static int SETTING = 4;
+	public final static int INTENT_GET_CONTACT = 5;
 	
 	public final static int SCANNIN_GREQUEST_CODE = 1000;
 }

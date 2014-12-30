@@ -88,7 +88,7 @@ public class AppActivity extends Activity{
 						break;
 					case Constants.MULTISENDSMS:
 						Intent intent2 = new Intent();
-						intent2.setClass(AppActivity.this, ChooseContacts.class);
+						intent2.setClass(AppActivity.this, MultiMessage.class);
 						startActivity(intent2);
 						overridePendingTransition(
 								R.anim.slide_right_in, R.anim.zoom_out);

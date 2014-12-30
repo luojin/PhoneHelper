@@ -10,17 +10,24 @@ import com.app.androidsms.adapter.SortAdapter;
 import com.app.androidsms.custom.widgets.SideBar;
 import com.app.androidsms.custom.widgets.SideBar.OnTouchingLetterChangedListener;
 import com.app.androidsms.util.CharacterParser;
+import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.ContactBean;
 import com.app.androidsms.util.PinyinComparator;
 
+import android.R.integer;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -48,14 +55,22 @@ public class ChooseContacts extends ActionBarActivity{
 	private Map<Integer, ContactBean> contactIdMap = null;
 	private AsyncQueryHandler asyncQueryHandler; // 异步查询数据库类对象
 	private List<ContactBean> list;
+	private int [] old_contact_id_list = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.choose_contacts);
-		initViews();
 		
-		// 实例化
+		ActionBar actionBar = getSupportActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    actionBar.setTitle(R.string.choose_to_send);
+	    
+	    old_contact_id_list = getIntent().getIntArrayExtra("selected_contactId_list");
+	    if( old_contact_id_list!=null)
+	    	counter = old_contact_id_list.length;
+	    
+		initViews();
 		asyncQueryHandler = new MyAsyncQueryHandler(getContentResolver());
 		init();
 	}
@@ -208,11 +223,12 @@ public class ChooseContacts extends ActionBarActivity{
 					} else {
 						// 创建联系人对象
 						ContactBean contact = new ContactBean();
-						contact.setDesplayName(name);
+						contact.setDisplayName(name);
 						contact.setPhoneNum(number);
 						contact.setSortKey(sortKey);
 						contact.setPhotoId(photoId);
 						contact.setLookUpKey(lookUpKey);
+						contact.setContactId(contactId);
 						contact.setCheck(false);
 						list.add( contact);
 
@@ -220,6 +236,14 @@ public class ChooseContacts extends ActionBarActivity{
 					}
 				}
 				if (list.size() > 0) {
+					if( old_contact_id_list!=null){
+						for(int m=0; m<old_contact_id_list.length; m++){
+							int item = old_contact_id_list[m];
+							if( contactIdMap.containsKey(item) )
+								contactIdMap.get(item).setCheck(true);
+						}
+					}
+					
 					SourceDateList = filledData( list);
 					// 根据a-z进行排序
 					Collections.sort(SourceDateList, pinyinComparator);
@@ -229,5 +253,74 @@ public class ChooseContacts extends ActionBarActivity{
 
 			super.onQueryComplete(token, cookie, cursor);
 		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.choose_contact, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch( item.getItemId() ){
+		case android.R.id.home: 
+			exit(null,null,null);
+			break;
+		case R.id.cancel:
+			exit(null,null,null);
+			break;
+		case R.id.confirm:
+			onChoose();
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	private void onChoose()
+	{
+		List<String> selected_number_list = new ArrayList<String>();
+		List<String> selected_name_list = new ArrayList<String>();
+		List<Integer> selected_contactId_list = new ArrayList<Integer>();
+		
+		for (ContactBean item : SourceDateList) {
+			if( item.isCheck()){
+				selected_name_list.add(  item.getDisplayName()); 
+				selected_number_list.add( item.getPhoneNum());
+				selected_contactId_list.add( item.getContactId() );
+			}
+		}
+		
+		String []selected_name_list_r    = new String[selected_name_list.size()];
+		String []selected_number_list_r = new String[selected_number_list.size()];
+		int []selected_contactId_list_r = new int[selected_contactId_list.size()];
+		for( int k=0; k<selected_name_list.size(); k++)
+		{
+			selected_name_list_r[k]    = selected_name_list.get(k);
+			selected_number_list_r[k] = selected_number_list.get(k);
+			selected_contactId_list_r[k] = selected_contactId_list.get(k);
+		}
+		
+		exit(selected_name_list_r,selected_number_list_r, selected_contactId_list_r);
+	}
+	
+	public void exit(String []selected_name_list, String []selected_number_list, int []selected_contactId_list)
+	{
+		Intent intent = new Intent();
+		intent.putExtra("selected_name_list",  selected_name_list);
+		intent.putExtra("selected_number_list",  selected_number_list);
+		intent.putExtra("selected_contactId_list", selected_contactId_list);
+		setResult(Constants.INTENT_GET_CONTACT, intent);
+		
+		finish();
+		overridePendingTransition(R.anim.zoom_in,
+			R.anim.slide_right_out);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		exit(null,null,null);
 	}
 }
