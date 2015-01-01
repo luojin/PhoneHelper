@@ -1,6 +1,6 @@
 package com.app.androidsms;
 
-import java.util.Random;
+import java.util.List;
 
 import com.app.androidsms.controller.PhoneController;
 import com.app.androidsms.controller.ProfilesController;
@@ -11,12 +11,12 @@ import com.app.androidsms.custom.widgets.CircleButton;
 import com.app.androidsms.custom.widgets.DragLayout;
 import com.app.androidsms.custom.widgets.DragLayout.DragListener;
 import com.app.androidsms.util.Constants;
+import com.app.androidsms.util.NameNumberPair;
 import com.nineoldandroids.view.ViewHelper;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -137,11 +137,14 @@ public class AppActivity extends Activity{
 		mSMSController.registerSMSReceiver();
 		mSMSController.setOnSendTaskDoneReceiver(new SendTaskDone() {
 			@Override
-			public void OnSendTaskDone(String[] SentNameList) {
+			public void OnSendTaskDone(List<NameNumberPair> mNameNumberPairList) {
 				// TODO Auto-generated method stub
 				String names = "";
-				for( int m=0; m<SentNameList.length; m++)
-					names+= (SentNameList[m]+"///");
+				for( int m=0; m<mNameNumberPairList.size(); m++)
+				{
+					if(mNameNumberPairList.get(m).getName()!=null)
+						names+= (mNameNumberPairList.get(m).getName()+"///");
+				}
 				setLogger( "end send msg to: "+names);
 			}
 		});
@@ -154,14 +157,14 @@ public class AppActivity extends Activity{
 				// TODO Auto-generated method stub
 				setLogger(inComingNumber+" Intercepted");
 				
-				String sms =  messageBody.getText().toString();
-				sms = (sms==null || sms.trim().length()==0) ? "i will call you later" :sms;
-				if( inComingNumber!=null && inComingNumber.trim().length()!=0)
-				{
-					String []nameList = inComingNumber.split("///");
-					mSMSController.sendSMSMulti(nameList, sms);
-					setLogger( "begin send msg to: "+inComingNumber);
-				}
+//				String sms =  messageBody.getText().toString();
+//				sms = (sms==null || sms.trim().length()==0) ? "i will call you later" :sms;
+//				if( inComingNumber!=null && inComingNumber.trim().length()!=0)
+//				{
+//					String []nameList = inComingNumber.split("///");
+//					mSMSController.sendSMSMulti(nameList, sms);
+//					setLogger( "begin send msg to: "+inComingNumber);
+//				}
 				
 //				setLogger(" start vibrator");
 //				mProfilesController.startVibrator();

@@ -1,5 +1,10 @@
 package com.app.androidsms.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.app.androidsms.util.NameNumberPair;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -22,9 +27,11 @@ public class SMSController {
 	private String SENT = "SMS_SENT", DELIVERED = "SMS_DELIVERED";
 	private PendingIntent sentPI, deliveredPI;
 	private BroadcastReceiver smsSentReceiver=null, smsDeliveredReceiver=null;
-	private String name[], message;
+	private String message;
+	private List<NameNumberPair> mNameNumberList;
 	private int sendIndex=0;
-	private SendTaskDone mSendTaskDone=null;
+//	private SendTaskDone mSendTaskDone=null;
+	private List<SendTaskDone> mSendTaskDoneList = null;
 	
 	public static synchronized SMSController get(Context cxt) {
         if (sInstance == null) 
@@ -50,37 +57,40 @@ public class SMSController {
 	 * @param name
 	 * @param msg
 	 */
-	private void setValue(int index, String[] name, String msg)
+	private void setValue(int index, List<NameNumberPair> list, String msg)
 	{
-		sendIndex=index; this.name=name; this.message=msg;
+		sendIndex=index; this.mNameNumberList=list; this.message=msg;
 	}
 	
-	public void sendSMSMulti(String[] phoneNumber, String msg)
+	public void sendSMSMulti(List<NameNumberPair> nameNumberList, String msg)
 	{
-		if( phoneNumber==null|| phoneNumber.length==0 || msg==null || msg.trim().length()==0) 
+		if( nameNumberList==null|| nameNumberList.size()==0 || msg==null || msg.trim().length()==0) 
 		{
 			Log.i(TAG, "sendSMSMulti value empty"); 
-			mSendTaskDone.OnSendTaskDone(null);
+			SendTaskDone(null);
 			return; 
 		}
 		
-		setValue(0, phoneNumber, msg);
-		sendSMS(name[sendIndex],  message);
+		setValue(0, nameNumberList, msg);
+		sendSMS(nameNumberList.get(sendIndex),  message);
 	}
 	
 	//sends an SMS message to another device
-	private void sendSMS(String phoneNumber, String message)
+	private void sendSMS(NameNumberPair item, String message)
 	{
-		Log.i(TAG, "sendSMS "+phoneNumber+" "+message);
-		if( phoneNumber==null || "".equals( phoneNumber) || "".equals(message) ) 
+		Log.i(TAG, "sendSMS "+item.getNumber()+" "+message);
+		if( item==null || "".equals( item.getNumber()) || "".equals(message) ) 
 		{
 			Log.i(TAG, "sendSMS value empty"); 
-			mSendTaskDone.OnSendTaskDone(null);
+			SendTaskDone(null);
 			return;
 		}
 		
+		if( item.getName()!=null && item.getName().length()>0)
+			message = item.getName()+", "+message;
+		
 		SmsManager smsManager = SmsManager.getDefault();
-		smsManager.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
+		smsManager.sendTextMessage(item.getNumber(), null, message, sentPI, deliveredPI);
 	}
 	
 	//register BroadcastReceiver
@@ -93,10 +103,10 @@ public class SMSController {
 				@Override
 				public void onReceive(Context arg0, Intent arg1) {
 					sendIndex++;
-					if( sendIndex<name.length)
-						sendSMS(name[sendIndex],  message);
+					if( sendIndex<mNameNumberList.size())
+						sendSMS(mNameNumberList.get(sendIndex),  message);
 					else{
-						mSendTaskDone.OnSendTaskDone(name);
+						SendTaskDone(mNameNumberList);
 						setValue(0,null,null);
 					}
 					
@@ -164,7 +174,19 @@ public class SMSController {
 	
 	public void setOnSendTaskDoneReceiver(SendTaskDone obj)
 	{
-		mSendTaskDone = obj;
+		if( mSendTaskDoneList==null )
+			mSendTaskDoneList =  new ArrayList<SMSController.SendTaskDone>();
+		
+		mSendTaskDoneList.add(obj);
+	}
+	
+	private void SendTaskDone(List<NameNumberPair> mNameNumberPairList)
+	{
+		if( mSendTaskDoneList==null ) return;
+		
+		for (SendTaskDone item : mSendTaskDoneList) {
+			item.OnSendTaskDone(mNameNumberPairList);
+		}
 	}
 	
 	/**
@@ -174,7 +196,7 @@ public class SMSController {
 	 *
 	 */
 	public interface SendTaskDone{
-		public void OnSendTaskDone(String []SentNameList);
+		public void OnSendTaskDone(List<NameNumberPair> mNameNumberPairList);
 	}
 
 }

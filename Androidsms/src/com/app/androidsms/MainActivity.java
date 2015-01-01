@@ -41,16 +41,16 @@ public class MainActivity extends ActionBarActivity {
 		
 		mSMSController = SMSController.get(getApplicationContext());
 		mSMSController.registerSMSReceiver();
-		mSMSController.setOnSendTaskDoneReceiver(new SendTaskDone() {
-			@Override
-			public void OnSendTaskDone(String[] SentNameList) {
-				// TODO Auto-generated method stub
-				String names = "";
-				for( int m=0; m<SentNameList.length; m++)
-					names+= (SentNameList[m]+"///");
-				setLogger( "end send msg to: "+names);
-			}
-		});
+//		mSMSController.setOnSendTaskDoneReceiver(new SendTaskDone() {
+//			@Override
+//			public void OnSendTaskDone(String[] SentNameList) {
+//				// TODO Auto-generated method stub
+//				String names = "";
+//				for( int m=0; m<SentNameList.length; m++)
+//					names+= (SentNameList[m]+"///");
+//				setLogger( "end send msg to: "+names);
+//			}
+//		});
 		
 		mPhoneController = PhoneController.get(getApplicationContext());
 		mProfilesController = ProfilesController.get(getApplicationContext());

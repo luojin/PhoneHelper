@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.app.androidsms.adapter.SelectedAdapter;
+import com.app.androidsms.controller.SMSController;
+import com.app.androidsms.controller.SMSController.SendTaskDone;
 import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.NameNumberPair;
 
@@ -14,7 +16,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MultiMessage extends ActionBarActivity{
 	
@@ -22,6 +28,8 @@ public class MultiMessage extends ActionBarActivity{
 	private int []selected_contactId_list = null;
 	private ListView selectedLV;
 	private SelectedAdapter mSelectedAdapter;
+	private EditText multi_msg_content;
+	private TextView hintTV;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +45,17 @@ public class MultiMessage extends ActionBarActivity{
 	    mNameNumberPair = new ArrayList<NameNumberPair>();
 	    mSelectedAdapter = new SelectedAdapter(getApplicationContext(), mNameNumberPair);
 	    selectedLV.setAdapter(mSelectedAdapter);
+	    multi_msg_content = (EditText) findViewById(R.id.multi_msg_content);
+	    hintTV = (TextView) findViewById(R.id.hint);
+	    
+	    SMSController.get(getApplicationContext()).setOnSendTaskDoneReceiver(new SendTaskDone() {
+			
+			@Override
+			public void OnSendTaskDone(List<NameNumberPair> mNameNumberPairList) {
+				// TODO Auto-generated method stub
+				resetHint();
+			}
+		});
 	}
 	
 	@Override
@@ -60,9 +79,38 @@ public class MultiMessage extends ActionBarActivity{
 					R.anim.slide_right_in, R.anim.zoom_out);
 			break;
 		case R.id.multi_send:
+			multiSend();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void multiSend()
+	{
+		String content = multi_msg_content.getText().toString().trim();
+		if( content==null || content.length()==0)
+			Toast.makeText(getApplicationContext(), "短信内容为空", Toast.LENGTH_SHORT).show();
+		else if( mNameNumberPair.size()==0 )
+			Toast.makeText(getApplicationContext(), "右上角选择要发送的人", Toast.LENGTH_SHORT).show();
+		else{
+			setHint("你的短信正在发送中，请稍候");
+			SMSController.get(getApplicationContext()).sendSMSMulti(mNameNumberPair, content);
+		}
+	}
+	
+	private void setHint(String hint)
+	{
+		hint = hint==null?"":hint;
+		
+		multi_msg_content.setVisibility(View.GONE);
+		hintTV.setVisibility(View.VISIBLE);
+		hintTV.setText("提示: "+hint);
+	}
+	
+	private void resetHint()
+	{
+		multi_msg_content.setVisibility(View.VISIBLE);
+		hintTV.setVisibility(View.GONE);
 	}
 	
 	@Override

@@ -15,6 +15,17 @@
 	        android:textSize="15sp"
 	        android:inputType="textMultiLine"/>
      
+     <TextView 
+         android:id="@+id/hint"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="10dp"
+	     android:layout_marginLeft="10dp"
+	     android:layout_marginRight="10dp"
+	      android:textSize="15sp"
+	      android:text="send finished"
+	      android:visibility="gone"/>
+     
      <ListView 
          android:id="@+id/selected_contact_lv"
          android:layout_width="fill_parent"
