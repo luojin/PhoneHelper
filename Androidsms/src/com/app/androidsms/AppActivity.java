@@ -16,6 +16,7 @@ import com.nineoldandroids.view.ViewHelper;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,7 +44,10 @@ public class AppActivity extends Activity{
 	private PhoneController mPhoneController;
 	private ProfilesController mProfilesController;
 	
+	private String name, phone;
+	private TextView nameTV, phoneTV;
 	private int mCurrentPosition = 0;
+	private SharedPreferences mUserPrefs;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +98,12 @@ public class AppActivity extends Activity{
 								R.anim.slide_right_in, R.anim.zoom_out);
 						break;
 					case Constants.SETTING:
+						Intent intent3 = new Intent();
+						intent3.setClass(AppActivity.this, SettingActivity.class);
+						intent3.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivityForResult(intent3, Constants.GET_SETTINGS);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
 						break;
 					default:
 						break;
@@ -108,6 +118,10 @@ public class AppActivity extends Activity{
 	}
 
 	private void initView() {
+		mUserPrefs = getSharedPreferences(Constants.PREF_USER_INFO,MODE_PRIVATE);
+		nameTV = (TextView)findViewById(R.id.name);
+		phoneTV = (TextView)findViewById(R.id.phone);
+		getPref();
 		
 		iv_icon = (ImageView) findViewById(R.id.iv_icon);
 		iv_icon.setOnClickListener(new OnClickListener() {
@@ -234,6 +248,14 @@ public class AppActivity extends Activity{
 		logTV.setText( setText);
 	}
 	
+	private void getPref()
+	{
+		name = mUserPrefs.getString(Constants.PREF_NAME, "name");
+		phone = mUserPrefs.getString(Constants.PREF_PHONE, "phone");
+		nameTV.setText(name);
+		phoneTV.setText(phone);
+	}
+	
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -247,6 +269,12 @@ public class AppActivity extends Activity{
 				//œ‘ æ
 				//mImageView.setImageBitmap((Bitmap) data.getParcelableExtra("bitmap"));
 			}
+			break;
+		case Constants.GET_SETTINGS:
+			Bundle bundle = data.getExtras();
+			name = bundle.getString(Constants.PREF_NAME);
+			phone = bundle.getString(Constants.PREF_PHONE);
+			getPref();
 			break;
 		}
     }	

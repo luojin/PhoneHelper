@@ -86,7 +86,6 @@ public class MyQRCode extends ActionBarActivity{
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
-		super.onBackPressed();
 		finish();
 		overridePendingTransition(R.anim.zoom_in,
 			R.anim.slide_right_out);

@@ -25,14 +25,28 @@
                 android:layout_height="70dp"
                 android:src="@drawable/ic_launcher" />
 
-            <TextView
+            <RelativeLayout 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="20dp"
-                android:text="BlueMor"
-                android:textColor="#ffffff"
-                android:textSize="25sp" />
+                android:layout_marginLeft="20dp">
+                <TextView
+                    android:id="@+id/name"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:text="name"
+	                android:textColor="#ffffff"
+	                android:textSize="25sp" />
+                <TextView
+                   android:id="@+id/phone"
+                   android:layout_below="@+id/name"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:text="phone"
+	                android:textColor="#ffffff"/>
+                
+            </RelativeLayout>
+            
         </LinearLayout>
 
 

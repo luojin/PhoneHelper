@@ -8,6 +8,7 @@
     <string name="my_qrcode_title">我的二维码</string>
     <string name="scan_qrcode_title">扫一扫</string>
     <string name="multi_send_msg">群发短信</string>
+    <string name="setting">设置</string>
     
     <string-array name="menu_array">
         <item>主页</item>
