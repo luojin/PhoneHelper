@@ -55,73 +55,19 @@ public class AppActivity extends Activity{
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.app_fragment);
 		
+		initialize();
+	}
+
+	/**
+	 * get view and initialize 
+	 */
+	private void initialize() {
 		initDragLayout();
-		initView();
-	}
-
-	private void initDragLayout() {
-		dl = (DragLayout) findViewById(R.id.dl);
-		dl.setDragListener(new DragListener() {
-			@Override
-			public void onOpen() {
-				//reset
-				mCurrentPosition = 0;
-			}
-
-			@Override
-			public void onClose() {
-				//do something
-				switch(mCurrentPosition){
-					case Constants.HOME:
-						shake();
-						break;
-					case Constants.SCAN:
-						Intent intent = new Intent();
-						intent.setClass(AppActivity.this, MipcaActivityCapture.class);
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivityForResult(intent, Constants.SCANNIN_GREQUEST_CODE);
-						overridePendingTransition(
-								R.anim.slide_right_in, R.anim.zoom_out);
-						break;
-					case Constants.QRCODE:
-						Intent intent1 = new Intent();
-						intent1.setClass(AppActivity.this, MyQRCode.class);
-						startActivity(intent1);
-						overridePendingTransition(
-								R.anim.slide_right_in, R.anim.zoom_out);
-						break;
-					case Constants.MULTISENDSMS:
-						Intent intent2 = new Intent();
-						intent2.setClass(AppActivity.this, MultiMessage.class);
-						startActivity(intent2);
-						overridePendingTransition(
-								R.anim.slide_right_in, R.anim.zoom_out);
-						break;
-					case Constants.SETTING:
-						Intent intent3 = new Intent();
-						intent3.setClass(AppActivity.this, SettingActivity.class);
-						intent3.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						startActivityForResult(intent3, Constants.GET_SETTINGS);
-						overridePendingTransition(
-								R.anim.slide_right_in, R.anim.zoom_out);
-						break;
-					default:
-						break;
-				}
-			}
-
-			@Override
-			public void onDrag(float percent) {
-				ViewHelper.setAlpha(iv_icon, 1 - percent);
-			}
-		});
-	}
-
-	private void initView() {
+		
 		mUserPrefs = getSharedPreferences(Constants.PREF_USER_INFO,MODE_PRIVATE);
 		nameTV = (TextView)findViewById(R.id.name);
 		phoneTV = (TextView)findViewById(R.id.phone);
-		getPref();
+		getUserInfo();
 		
 		iv_icon = (ImageView) findViewById(R.id.iv_icon);
 		iv_icon.setOnClickListener(new OnClickListener() {
@@ -222,12 +168,76 @@ public class AppActivity extends Activity{
 			}
 		});
 	}
+	
+	/**
+	 * initialize drag layout
+	 */
+	private void initDragLayout() {
+		dl = (DragLayout) findViewById(R.id.dl);
+		dl.setDragListener(new DragListener() {
+			@Override
+			public void onOpen() {
+				//reset
+				mCurrentPosition = 0;
+			}
+
+			@Override
+			public void onClose() {
+				//do something
+				switch(mCurrentPosition){
+					case Constants.HOME:
+						break;
+					case Constants.SCAN:
+						Intent intent = new Intent();
+						intent.setClass(AppActivity.this, MipcaActivityCapture.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivityForResult(intent, Constants.SCANNIN_GREQUEST_CODE);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
+						break;
+					case Constants.QRCODE:
+						Intent intent1 = new Intent();
+						intent1.setClass(AppActivity.this, MyQRCode.class);
+						startActivity(intent1);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
+						break;
+					case Constants.MULTISENDSMS:
+						Intent intent2 = new Intent();
+						intent2.setClass(AppActivity.this, MultiMessage.class);
+						startActivity(intent2);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
+						break;
+					case Constants.SETTING:
+						Intent intent3 = new Intent();
+						intent3.setClass(AppActivity.this, SettingActivity.class);
+						intent3.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivityForResult(intent3, Constants.GET_SETTINGS);
+						overridePendingTransition(
+								R.anim.slide_right_in, R.anim.zoom_out);
+						break;
+					default:
+						break;
+				}
+			}
+
+			@Override
+			public void onDrag(float percent) {
+				ViewHelper.setAlpha(iv_icon, 1 - percent);
+			}
+		});
+	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		shake();
 	}
 
+	/**
+	 * the icon will shake while DragLayout closed
+	 */
 	private void shake() {
 		iv_icon.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake));
 	}
@@ -248,7 +258,11 @@ public class AppActivity extends Activity{
 		logTV.setText( setText);
 	}
 	
-	private void getPref()
+	/**
+	 * get user information
+	 * including name and phone number
+	 */
+	private void getUserInfo()
 	{
 		name = mUserPrefs.getString(Constants.PREF_NAME, "name");
 		phone = mUserPrefs.getString(Constants.PREF_PHONE, "phone");
@@ -276,7 +290,7 @@ public class AppActivity extends Activity{
 			Bundle bundle = data.getExtras();
 			name = bundle.getString(Constants.PREF_NAME);
 			phone = bundle.getString(Constants.PREF_PHONE);
-			getPref();
+			getUserInfo();
 			break;
 		}
     }	
