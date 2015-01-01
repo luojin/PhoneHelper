@@ -56,6 +56,8 @@ public class ChooseContacts extends ActionBarActivity{
 	private AsyncQueryHandler asyncQueryHandler; // 异步查询数据库类对象
 	private List<ContactBean> list;
 	private int [] old_contact_id_list = null;
+	
+	private boolean select_all = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +119,7 @@ public class ChooseContacts extends ActionBarActivity{
 					counter++;
 					SourceDateList.get(position).setCheck( true);
 				}
-				hint.setText("共选择了: "+counter+"人");
-				adapter.updateListView(SourceDateList);
+				updateListView(counter);
 			}
 		});
 		
@@ -153,29 +154,6 @@ public class ChooseContacts extends ActionBarActivity{
 			mSortList.add(sortModel);
 		}
 		return mSortList;
-	}
-	
-	/**
-	 * 根据输入框中的值来过滤数据并更新ListView
-	 * @param filterStr
-	 */
-	private void filterData(String filterStr){
-		List<ContactBean> filterDateList = new ArrayList<ContactBean>();
-		
-		if(TextUtils.isEmpty(filterStr)){
-			filterDateList = SourceDateList;
-		}else{
-			filterDateList.clear();
-			for(ContactBean sortModel : SourceDateList){
-				String name = sortModel.getDisplayName();
-				if(name.indexOf(filterStr.toString()) != -1 || characterParser.getSelling(name).startsWith(filterStr.toString())){
-					filterDateList.add(sortModel);
-				}
-			}
-		}
-		// 根据a-z进行排序
-		Collections.sort(filterDateList, pinyinComparator);
-		adapter.updateListView(filterDateList);
 	}
 	
 	/**
@@ -247,7 +225,7 @@ public class ChooseContacts extends ActionBarActivity{
 					SourceDateList = filledData( list);
 					// 根据a-z进行排序
 					Collections.sort(SourceDateList, pinyinComparator);
-					adapter.updateListView(SourceDateList);
+					updateListView(counter);
 				}
 			}
 
@@ -266,16 +244,36 @@ public class ChooseContacts extends ActionBarActivity{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch( item.getItemId() ){
 		case android.R.id.home: 
-			exit(null,null,null);
+			onBackPressed();
 			break;
-		case R.id.cancel:
-			exit(null,null,null);
+		case R.id.select_all:
+			selected_all();
 			break;
 		case R.id.confirm:
 			onChoose();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void selected_all()
+	{
+		for (int k=0; k<SourceDateList.size(); k++) 
+			SourceDateList.get(k).setCheck( !select_all);
+		
+		if( !select_all)
+			counter = SourceDateList.size();
+		else
+			counter = 0;
+		
+		updateListView(counter);
+		select_all = !select_all;
+	}
+	
+	private void updateListView(int counter)
+	{
+		hint.setText("共选择了: "+counter+"人");
+		adapter.updateListView(SourceDateList);
 	}
 	
 	private void onChoose()
@@ -313,14 +311,14 @@ public class ChooseContacts extends ActionBarActivity{
 		intent.putExtra("selected_contactId_list", selected_contactId_list);
 		setResult(Constants.INTENT_GET_CONTACT, intent);
 		
-		finish();
-		overridePendingTransition(R.anim.zoom_in,
-			R.anim.slide_right_out);
+		onBackPressed();
 	}
 	
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
-		exit(null,null,null);
+		finish();
+		overridePendingTransition(R.anim.zoom_in,
+			R.anim.slide_right_out);
 	}
 }
