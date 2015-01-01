@@ -252,6 +252,8 @@ public class AppActivity extends Activity{
 	{
 		name = mUserPrefs.getString(Constants.PREF_NAME, "name");
 		phone = mUserPrefs.getString(Constants.PREF_PHONE, "phone");
+		name = name==""?"name":name;
+		phone = phone==""?"phone":phone;
 		nameTV.setText(name);
 		phoneTV.setText(phone);
 	}
