@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.app.androidsms.adapter.SortAdapter;
+import com.app.androidsms.controller.ContactsController;
 import com.app.androidsms.custom.widgets.SideBar;
 import com.app.androidsms.custom.widgets.SideBar.OnTouchingLetterChangedListener;
 import com.app.androidsms.util.CharacterParser;
@@ -53,7 +54,6 @@ public class ChooseContacts extends ActionBarActivity{
 	private PinyinComparator pinyinComparator;
 	
 	private Map<Integer, ContactBean> contactIdMap = null;
-	private AsyncQueryHandler asyncQueryHandler; // 异步查询数据库类对象
 	private List<ContactBean> list;
 	private int [] old_contact_id_list = null;
 	
@@ -73,8 +73,6 @@ public class ChooseContacts extends ActionBarActivity{
 	    	counter = old_contact_id_list.length;
 	    
 		initViews();
-		asyncQueryHandler = new MyAsyncQueryHandler(getContentResolver());
-		init();
 	}
 
 	private void initViews() {
@@ -124,10 +122,57 @@ public class ChooseContacts extends ActionBarActivity{
 		});
 		
 		SourceDateList = new ArrayList<ContactBean>();
-		// 根据a-z进行排序源数据
-		Collections.sort(SourceDateList, pinyinComparator);
 		adapter = new SortAdapter(this, SourceDateList);
 		sortListView.setAdapter(adapter);
+		
+		/**
+		 * 添加一个回调函数
+		 * 查询通讯录结束会回调
+		 */
+		ContactsController.get(getApplicationContext()).addQueryContactFinish(new ContactsController.QueryContactFinish() {
+			
+			@Override
+			public void onQueryContactFinish() {
+				// TODO Auto-generated method stub
+				QueryContactFinish();
+			}
+		});
+		QueryContactFinish();
+	}
+	
+	private void QueryContactFinish()
+	{
+		contactIdMap = ContactsController.get(getApplicationContext()).getContactMap();
+		if( contactIdMap==null ) {
+			return;
+		}
+		
+		list = getContactBeanList();
+		if (list.size() > 0) {
+			if( old_contact_id_list!=null){
+				for(int m=0; m<old_contact_id_list.length; m++){
+					int item = old_contact_id_list[m];
+					if( contactIdMap.containsKey(item) )
+						contactIdMap.get(item).setCheck(true);
+				}
+			}
+			
+			SourceDateList = filledData( list);
+			// 根据a-z进行排序
+			Collections.sort(SourceDateList, pinyinComparator);
+			updateListView(counter);
+		}
+	}
+	
+	public List<ContactBean> getContactBeanList()
+	{
+		if( contactIdMap==null) return null;
+		
+		List<ContactBean> contactBeanList = new ArrayList<ContactBean>();
+		for (Integer key : contactIdMap.keySet()) 
+			contactBeanList.add( contactIdMap.get(key));
+		
+		return contactBeanList;
 	}
 
 	/**
@@ -154,83 +199,6 @@ public class ChooseContacts extends ActionBarActivity{
 			mSortList.add(sortModel);
 		}
 		return mSortList;
-	}
-	
-	/**
-	 * 初始化数据库查询参数
-	 */
-	private void init() {
-		Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI; // 联系人Uri；
-		// 查询的字段
-		String[] projection = { ContactsContract.CommonDataKinds.Phone._ID,
-				ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-				ContactsContract.CommonDataKinds.Phone.DATA1, "sort_key",
-				ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-				ContactsContract.CommonDataKinds.Phone.PHOTO_ID,
-				ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY };
-		// 按照sort_key升序查詢
-		asyncQueryHandler.startQuery(0, null, uri, projection, null, null,
-				"sort_key COLLATE LOCALIZED asc");
-	}
-	
-	/**
-	 * 查询通讯录结束回调函数
-	 */
-	private class MyAsyncQueryHandler extends AsyncQueryHandler {
-		public MyAsyncQueryHandler(ContentResolver cr) {
-			super(cr);
-		}
-
-		@Override
-		protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-			if (cursor != null && cursor.getCount() > 0) {
-				contactIdMap = new HashMap<Integer, ContactBean>();
-				list = new ArrayList<ContactBean>();
-				cursor.moveToFirst(); // 游标移动到第一项
-				for (int i = 0; i < cursor.getCount(); i++) {
-					cursor.moveToPosition(i);
-					String name = cursor.getString(1);
-					String number = cursor.getString(2);
-					String sortKey = cursor.getString(3);
-					int contactId = cursor.getInt(4);
-					Long photoId = cursor.getLong(5);
-					String lookUpKey = cursor.getString(6);
-
-					if (contactIdMap.containsKey(contactId)) {
-						// 无操作
-					} else {
-						// 创建联系人对象
-						ContactBean contact = new ContactBean();
-						contact.setDisplayName(name);
-						contact.setPhoneNum(number);
-						contact.setSortKey(sortKey);
-						contact.setPhotoId(photoId);
-						contact.setLookUpKey(lookUpKey);
-						contact.setContactId(contactId);
-						contact.setCheck(false);
-						list.add( contact);
-
-						contactIdMap.put(contactId, contact);
-					}
-				}
-				if (list.size() > 0) {
-					if( old_contact_id_list!=null){
-						for(int m=0; m<old_contact_id_list.length; m++){
-							int item = old_contact_id_list[m];
-							if( contactIdMap.containsKey(item) )
-								contactIdMap.get(item).setCheck(true);
-						}
-					}
-					
-					SourceDateList = filledData( list);
-					// 根据a-z进行排序
-					Collections.sort(SourceDateList, pinyinComparator);
-					updateListView(counter);
-				}
-			}
-
-			super.onQueryComplete(token, cookie, cursor);
-		}
 	}
 	
 	@Override
@@ -316,7 +284,11 @@ public class ChooseContacts extends ActionBarActivity{
 	
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
+		/**
+		 * 删除一个QueryContactFinish回掉
+		 */
+		ContactsController.get(getApplicationContext()).removeQueryContactFinish();
+		
 		finish();
 		overridePendingTransition(R.anim.zoom_in,
 			R.anim.slide_right_out);

@@ -11,8 +11,11 @@ import android.telephony.TelephonyManager;
 
 /**
  * 控制来电拦截与否
+ * 监听模式：
+ * 					所有电话都拦截，自动回复短信
+ * 非监听模式：
+ * 					白名单中的来电，自动更改情景模式为声音100+震动
  * @author luo-PC
- *
  */
 public class PhoneController {
 	private static String TAG = PhoneController.class.getSimpleName();
@@ -57,27 +60,37 @@ public class PhoneController {
 	            @Override  
 	            public void onCallStateChanged(int state,String number)
 	            {  
-	            	if( !isMonitoring) return;
-	            	
 	            	switch(state){
 	            	//the calling is coming
-		            	case TelephonyManager.CALL_STATE_RINGING:
-//		            		try {
-//								iTelephony.endCall();
-								whenComingCall(number);
-//							} catch (RemoteException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-		            		break;
+	            	case TelephonyManager.CALL_STATE_RINGING:
+	            		if( isMonitoring() ){
+		            		try {
+								iTelephony.endCall();
+								whenComingCall( number);
+								//send message
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	            		}else{
+	            			//if白名单的来电，自动切换情景模式
+	            			ProfilesController.get(mContext.getApplicationContext()).getInitProfile();
+	            			ProfilesController.get(mContext.getApplicationContext()).RingAndVibrate();
+	            		}
+	            		break;
 		            //the calling is ended
-		            	case TelephonyManager.CALL_STATE_IDLE:
-		            		mOnCallChange.OnCallOffhook(number);
-		            		break;
-	            		default:
-	            			break;
+	            	case TelephonyManager.CALL_STATE_IDLE:
+	            		whenEndCall(number);
+	            		
+	            		if( !isMonitoring() )
+	            		{
+	            			//if白名单的来电, 恢复情景模式
+	            			ProfilesController.get(mContext.getApplicationContext()).resetProfile();
+	            		}
+	            		break;
+            		default:
+            			break;
 	            	}
-	                
 	            }  
 	        };  
     	}
@@ -101,6 +114,12 @@ public class PhoneController {
 	{
 		if( mOnCallChange!=null)
 			mOnCallChange.OnComingCall(inComingNumber);
+	}
+	
+	private void whenEndCall(String inComingNumber)
+	{
+		if( mOnCallChange!=null)
+			mOnCallChange.OnCallOffhook(inComingNumber);
 	}
 
 	/**

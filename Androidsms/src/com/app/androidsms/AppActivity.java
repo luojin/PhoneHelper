@@ -1,7 +1,11 @@
 package com.app.androidsms;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.app.androidsms.controller.ContactsController;
+import com.app.androidsms.controller.ContactsController.QueryContactFinish;
 import com.app.androidsms.controller.PhoneController;
 import com.app.androidsms.controller.ProfilesController;
 import com.app.androidsms.controller.SMSController;
@@ -18,6 +22,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -42,19 +47,19 @@ public class AppActivity extends Activity{
 	
 	private SMSController mSMSController;
 	private PhoneController mPhoneController;
-	private ProfilesController mProfilesController;
+	private ContactsController mContactsController;
 	
 	private String name, phone;
 	private TextView nameTV, phoneTV;
 	private int mCurrentPosition = 0;
-	private SharedPreferences mUserPrefs;
+	private SharedPreferences mUserPrefs = null;
+	private Map<String, String> mNumberNameMap;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.app_fragment);
-		
 		initialize();
 	}
 
@@ -64,12 +69,19 @@ public class AppActivity extends Activity{
 	private void initialize() {
 		initDragLayout();
 		
-		mUserPrefs = getSharedPreferences(Constants.PREF_USER_INFO,MODE_PRIVATE);
+		/**
+		 * get widgets
+		 */
 		nameTV = (TextView)findViewById(R.id.name);
 		phoneTV = (TextView)findViewById(R.id.phone);
-		getUserInfo();
-		
 		iv_icon = (ImageView) findViewById(R.id.iv_icon);
+		lv = (ListView) findViewById(R.id.lv);	
+		messageBody = (EditText) findViewById(R.id.smsBody);
+		logTV = (TextView) findViewById(R.id.log);
+		controlBtn = (CircleButton) findViewById(R.id.controlbtn);
+		controlBtnTV = (TextView) findViewById(R.id.controlbtnTV);
+		
+		getUserInfo();
 		iv_icon.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -77,7 +89,6 @@ public class AppActivity extends Activity{
 			}
 		});
 		
-		lv = (ListView) findViewById(R.id.lv);	
 		lv.setAdapter(new ArrayAdapter<String>(AppActivity.this,
 				R.layout.item_text, getResources().getStringArray(R.array.menu_array) ));
 		lv.setOnItemClickListener(new OnItemClickListener() {
@@ -90,9 +101,6 @@ public class AppActivity extends Activity{
 			}
 		});
 		
-		messageBody = (EditText) findViewById(R.id.smsBody);
-		logTV = (TextView) findViewById(R.id.log);
-		
 		mSMSController = SMSController.get(getApplicationContext());
 		mSMSController.registerSMSReceiver();
 		mSMSController.setOnSendTaskDoneReceiver(new SendTaskDone() {
@@ -104,47 +112,44 @@ public class AppActivity extends Activity{
 				{
 					if(mNameNumberPairList.get(m).getName()!=null)
 						names+= (mNameNumberPairList.get(m).getName()+"///");
+					else if( mNameNumberPairList.get(m).getNumber()!=null)
+						names+= (mNameNumberPairList.get(m).getNumber()+"///");
 				}
 				setLogger( "end send msg to: "+names);
 			}
 		});
 		
 		mPhoneController = PhoneController.get(getApplicationContext());
-		mProfilesController = ProfilesController.get(getApplicationContext());
 		mPhoneController.setmOnEndCall(new OnCallChange() {
 			@Override
 			public void OnComingCall(String inComingNumber) {
 				// TODO Auto-generated method stub
 				setLogger(inComingNumber+" Intercepted");
 				
-//				String sms =  messageBody.getText().toString();
-//				sms = (sms==null || sms.trim().length()==0) ? "i will call you later" :sms;
-//				if( inComingNumber!=null && inComingNumber.trim().length()!=0)
-//				{
-//					String []nameList = inComingNumber.split("///");
-//					mSMSController.sendSMSMulti(nameList, sms);
-//					setLogger( "begin send msg to: "+inComingNumber);
-//				}
-				
-//				setLogger(" start vibrator");
-//				mProfilesController.startVibrator();
-//				mProfilesController.setVolume(100);
+				if( mPhoneController.isMonitoring() ){
+					mNumberNameMap = mContactsController.getNumberNameMap();
+					//send msg
+					List<NameNumberPair>  mNameNumberPair = new ArrayList<NameNumberPair>();
+					String inComingName = "";
+					String msgContent = messageBody.getText().toString().trim();
+					if( mNumberNameMap!=null )
+						inComingName = mNumberNameMap.get(inComingNumber);
+					if( msgContent==null || msgContent.length()==0 )
+						msgContent = "我现在有事，迟点给你回电话吧。";
+					
+					mNameNumberPair.add( new NameNumberPair(inComingName, inComingNumber));
+					mSMSController.sendSMSMulti(mNameNumberPair, msgContent);
+				}
 			}
 
 			@Override
 			public void OnCallOffhook(String offhookNumber) {
-				// TODO Auto-generated method stub
-				setLogger(" stop vibrator");
-				
-//				mProfilesController.stopVibrator();
-//				mProfilesController.setVolume(0);
+				if( mPhoneController.isMonitoring())
+					setLogger("来电结束：" + offhookNumber);
 			}
 		});
 		
-		controlBtn = (CircleButton) findViewById(R.id.controlbtn);
-		controlBtnTV = (TextView) findViewById(R.id.controlbtnTV);
 		controlBtn.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				if( mPhoneController.isMonitoring())
@@ -159,12 +164,17 @@ public class AppActivity extends Activity{
 					controlBtnTV.setText("stop");controlBtn.setColor( getResources().getColor(R.color.control_btn_start));
 					setLogger("start monitor");
 				}
-				
-//				Intent intent = new Intent();
-//				intent.setClass(AppActivity.this, MyQRCode.class);
-////				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-////				startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
-//				startActivity(intent);
+			}
+		});
+		
+		controlBtn.setVisibility(View.INVISIBLE);
+		mContactsController = ContactsController.get(getApplicationContext());       //begin query contacts database
+		mContactsController.addQueryContactFinish(new QueryContactFinish() {
+			
+			@Override
+			public void onQueryContactFinish() {
+				// TODO Auto-generated method stub
+				controlBtn.setVisibility(View.VISIBLE);
 			}
 		});
 	}
@@ -264,6 +274,9 @@ public class AppActivity extends Activity{
 	 */
 	private void getUserInfo()
 	{
+		if( mUserPrefs==null)
+			mUserPrefs = getSharedPreferences(Constants.PREF_USER_INFO,MODE_PRIVATE);
+		
 		name = mUserPrefs.getString(Constants.PREF_NAME, "name");
 		phone = mUserPrefs.getString(Constants.PREF_PHONE, "phone");
 		name = name==""?"name":name;
@@ -280,10 +293,7 @@ public class AppActivity extends Activity{
 			if(resultCode == RESULT_OK){
 				Bundle bundle = data.getExtras();
 				//显示扫描到的内容
-				//mTextView.setText(bundle.getString("result"));
-				setLogger(bundle.getString("result") );
-				//显示
-				//mImageView.setImageBitmap((Bitmap) data.getParcelableExtra("bitmap"));
+				setLogger("二维码内容: " + bundle.getString("result") );
 			}
 			break;
 		case Constants.GET_SETTINGS:

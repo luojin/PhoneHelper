@@ -17,6 +17,8 @@ public class ProfilesController {
 	private Vibrator vibrator;
 	long []vibratorPattern = {1000,1000}; //stop start stop start ms毫秒为单位的停止和开始震动
 
+	private int originVolume, originMode;
+	
 	public static synchronized ProfilesController get(Context cxt) {
         if (sInstance == null) 
             sInstance = new ProfilesController(cxt);
@@ -30,9 +32,38 @@ public class ProfilesController {
 	}
 	
 	/**
+	 * 获取当前情景模式
+	 */
+	public void getInitProfile()
+	{
+		originVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
+		originMode = mAudioManager.getRingerMode();
+	}
+	
+	/**
+	 * 恢复情景模式
+	 */
+	public void resetProfile()
+	{
+		stopVibrator();
+		setVolume(originVolume);
+		mAudioManager.setRingerMode(originMode);
+	}
+	
+	/**
+	 * 声音+震动
+	 */
+    public void RingAndVibrate() 
+    {
+    	setVolume(100);
+    	startVibrator();
+    	mAudioManager.setRingerMode(originMode);
+    }
+	
+	/**
 	 * 设置音量大小
 	 */
-	public void setVolume(int index)
+	private void setVolume(int index)
 	{
 		//streamType铃声类型, index音量大小, flags
 		mAudioManager.setStreamVolume(AudioManager.STREAM_RING, index, 0);
@@ -42,7 +73,7 @@ public class ProfilesController {
 	 * 开始震动
 	 * from index 0 to repeat the pattern
 	 */
-	public void startVibrator()
+	private void startVibrator()
 	{
 		vibrator.vibrate(vibratorPattern, 0);  
 	}
@@ -50,7 +81,7 @@ public class ProfilesController {
 	/**
 	 * 取消震动
 	 */
-	public void stopVibrator()
+	private void stopVibrator()
 	{
 		vibrator.cancel();
 	}

@@ -69,16 +69,16 @@ public class MainActivity extends ActionBarActivity {
 //					setLogger( "begin send msg to: "+inComingNumber);
 //				}
 				setLogger(" start vibrator");
-				mProfilesController.startVibrator();
-				mProfilesController.setVolume(100);
+//				mProfilesController.startVibrator();
+//				mProfilesController.setVolume(100);
 			}
 
 			@Override
 			public void OnCallOffhook(String offhookNumber) {
 				// TODO Auto-generated method stub
 				setLogger(" stop vibrator");
-				mProfilesController.stopVibrator();
-				mProfilesController.setVolume(0);
+//				mProfilesController.stopVibrator();
+//				mProfilesController.setVolume(0);
 			}
 		});
 		
@@ -149,7 +149,7 @@ public class MainActivity extends ActionBarActivity {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		mSMSController.unregisterSMSReceiver();
-		mProfilesController.stopVibrator();
+//		mProfilesController.stopVibrator();
 	}
 	
 	@Override
