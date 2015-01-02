@@ -12,6 +12,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 
 /**
@@ -36,8 +37,56 @@ public class ContactsController {
 	private ContactsController(Context cxt){
 		this.mContext = cxt; 
 		mContactQueryHandler = new ContactQueryHandler(mContext.getContentResolver());
-		beginQuery();
+//		beginQuery();
+		getPhoneContacts();
 	}
+	
+	private void getPhoneContacts() {
+        ContentResolver resolver = mContext.getContentResolver();
+        String[] projection = { ContactsContract.CommonDataKinds.Phone._ID,
+				ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+				ContactsContract.CommonDataKinds.Phone.DATA1, "sort_key",
+				ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+				ContactsContract.CommonDataKinds.Phone.PHOTO_ID,
+				ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY };
+
+        // 获取手机联系人
+        Cursor cursor = resolver.query(Phone.CONTENT_URI,projection, null, null, null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+			contactIdMap = new HashMap<Integer, ContactBean>();
+			
+			cursor.moveToFirst(); // 游标移动到第一项
+			for (int i = 0; i < cursor.getCount(); i++) {
+				cursor.moveToPosition(i);
+				String name = cursor.getString(1);
+				String number = cursor.getString(2).replace(" ", "");
+				String sortKey = cursor.getString(3);
+				int contactId = cursor.getInt(4);
+				Long photoId = cursor.getLong(5);
+				String lookUpKey = cursor.getString(6);
+
+				if (contactIdMap.containsKey(contactId)) {
+					// 无操作
+				} else {
+					// 创建联系人对象
+					ContactBean contact = new ContactBean();
+					contact.setDisplayName(name);
+					contact.setPhoneNum(number);
+					contact.setSortKey(sortKey);
+					contact.setPhotoId(photoId);
+					contact.setLookUpKey(lookUpKey);
+					contact.setContactId(contactId);
+					contact.setCheck(false);
+					
+					contactIdMap.put(contactId, contact);
+				}
+			}
+			
+			onQueryDone();
+		}
+        cursor.close();
+    }
 	
 	/**
 	 * 初始化数据库查询参数

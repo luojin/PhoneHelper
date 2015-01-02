@@ -306,7 +306,6 @@ public class AppActivity extends Activity{
 				String result = bundle.getString("result");
 				if( result==null ) return;
 				
-				setLogger("二维码内容: " + result );
 				String []addItem = result.split(Constants.STRING_DIVIDER);
 				if( addItem.length==2)
 				{
@@ -314,6 +313,10 @@ public class AppActivity extends Activity{
 					NameNumberPair item = new NameNumberPair(addItem[0], addItem[1]);
 					WhiteListManager.get(getApplicationContext()).addPrefPair(item);
 					setLogger("授权给： " + addItem[0] );
+				}
+				else
+				{
+					setLogger("二维码内容: " + result );
 				}
 			}
 			break;
