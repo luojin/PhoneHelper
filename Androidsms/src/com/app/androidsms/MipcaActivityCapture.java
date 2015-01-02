@@ -41,6 +41,12 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
+
+/**
+ * É¨Ò»É¨
+ * @author luo-PC
+ *
+ */
 public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 
 	private CaptureActivityHandler handler;
@@ -54,7 +60,6 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 	private static final float BEEP_VOLUME = 0.10f;
 	private boolean vibrate;
 	
-	
 	private static final int REQUEST_CODE = 100;
 	private static final int PARSE_BARCODE_SUC = 300;
 	private static final int PARSE_BARCODE_FAIL = 303;
@@ -66,36 +71,35 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_capture);
-		//ViewUtil.addTopView(getApplicationContext(), this, R.string.scan_card);
+		
+		ActionBar actionBar = getSupportActionBar();
+	    actionBar.setDisplayHomeAsUpEnabled(true);
+	    actionBar.setTitle(R.string.scan_qrcode_title);
+		
 		CameraManager.init(getApplication());
 		viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
 		
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
-		
-		ActionBar actionBar = getSupportActionBar();
-	    actionBar.setDisplayHomeAsUpEnabled(true);
-	    actionBar.setTitle(R.string.scan_qrcode_title);
 	}
 	
 	private Handler mHandler = new Handler(){
-
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
-			
 			switch (msg.what) {
-			case PARSE_BARCODE_SUC:
-				onResultHandler((String)msg.obj, scanBitmap);
-				break;
-			case PARSE_BARCODE_FAIL:
-				Toast.makeText(MipcaActivityCapture.this, (String)msg.obj, Toast.LENGTH_LONG).show();
-				break;
+				case PARSE_BARCODE_SUC:
+					onResultHandler((String)msg.obj, scanBitmap);
+					break;
+				case PARSE_BARCODE_FAIL:
+					Toast.makeText(MipcaActivityCapture.this, (String)msg.obj, Toast.LENGTH_LONG).show();
+					break;
+				default:
+					break;
 			}
 		}
 	};
 	
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -123,9 +127,7 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 						}
 					}
 				}).start();
-				
 				break;
-			
 			}
 		}
 	}
@@ -133,7 +135,7 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 	/**
 	 * É¨Ãè¶þÎ¬ÂëÍ¼Æ¬µÄ·½·¨
 	 * @param path
-	 * @return
+	 * @return Result
 	 */
 	public Result scanningImage(String path) {
 		if(TextUtils.isEmpty(path)){
@@ -189,7 +191,6 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 		}
 		initBeepSound();
 		vibrate = true;
-		
 	}
 
 	@Override
@@ -210,7 +211,6 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 	
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		super.onBackPressed();
 		finish();
 		overridePendingTransition(R.anim.zoom_in,
@@ -265,7 +265,6 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-
 	}
 
 	@Override
@@ -274,13 +273,11 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 			hasSurface = true;
 			initCamera(holder);
 		}
-
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		hasSurface = false;
-
 	}
 
 	public ViewfinderView getViewfinderView() {
@@ -293,7 +290,6 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 
 	public void drawViewfinder() {
 		viewfinderView.drawViewfinder();
-
 	}
 
 	private void initBeepSound() {

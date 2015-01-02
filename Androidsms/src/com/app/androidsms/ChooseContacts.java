@@ -2,7 +2,6 @@ package com.app.androidsms;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,17 +14,10 @@ import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.ContactBean;
 import com.app.androidsms.util.PinyinComparator;
 
-import android.R.integer;
-import android.content.AsyncQueryHandler;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,29 +27,35 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * 群发短信前，选择联系人
+ * @author luo-PC
+ *
+ */
 public class ChooseContacts extends ActionBarActivity{
+	/**
+	 * variables
+	 */
 	private ListView sortListView;
 	private SideBar sideBar;
 	private TextView dialog, hint;
 	private SortAdapter adapter;
 	private int counter = 0;
+	private Map<Integer, ContactBean> contactIdMap = null;
+	private List<ContactBean> list;
+	private int [] old_contact_id_list = null;
+	private boolean select_all = false;
+	private List<ContactBean> SourceDateList;
 	
 	/**
 	 * 汉字转换成拼音的类
 	 */
 	private CharacterParser characterParser;
-	private List<ContactBean> SourceDateList;
 	
 	/**
 	 * 根据拼音来排列ListView里面的数据类
 	 */
 	private PinyinComparator pinyinComparator;
-	
-	private Map<Integer, ContactBean> contactIdMap = null;
-	private List<ContactBean> list;
-	private int [] old_contact_id_list = null;
-	
-	private boolean select_all = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,18 +74,17 @@ public class ChooseContacts extends ActionBarActivity{
 	}
 
 	private void initViews() {
-		//实例化汉字转拼音类
 		characterParser = CharacterParser.getInstance();
-		
 		pinyinComparator = new PinyinComparator();
 		
 		sideBar = (SideBar) findViewById(R.id.sidrbar);
 		dialog = (TextView) findViewById(R.id.dialog);
-		sideBar.setTextView(dialog);
 		hint = (TextView) findViewById(R.id.hint);
+		
+		sideBar.setTextView(dialog);
 		hint.setText("共选择了: "+counter+"人");
 		
-		//设置右侧触摸监听
+		//设置右侧字母表触摸监听
 		sideBar.setOnTouchingLetterChangedListener(new OnTouchingLetterChangedListener() {
 			@Override
 			public void onTouchingLetterChanged(String s) {
@@ -107,13 +104,11 @@ public class ChooseContacts extends ActionBarActivity{
 					int position, long id) {
 				//这里要利用adapter.getItem(position)来获取当前position所对应的对象
 				ContactBean item = SourceDateList.get(position);
-				if( item.isCheck() )
-				{
+				if( item.isCheck() ){
 					counter--;
 					SourceDateList.get(position).setCheck( false);
 				}
-				else
-				{
+				else{
 					counter++;
 					SourceDateList.get(position).setCheck( true);
 				}
@@ -133,13 +128,15 @@ public class ChooseContacts extends ActionBarActivity{
 			
 			@Override
 			public void onQueryContactFinish() {
-				// TODO Auto-generated method stub
 				QueryContactFinish();
 			}
 		});
 		QueryContactFinish();
 	}
 	
+	/**
+	 * 显示数据到列表中
+	 */
 	private void QueryContactFinish()
 	{
 		contactIdMap = ContactsController.get(getApplicationContext()).getContactMap();
@@ -164,6 +161,10 @@ public class ChooseContacts extends ActionBarActivity{
 		}
 	}
 	
+	/**
+	 * 获取通讯录列表
+	 * @return
+	 */
 	public List<ContactBean> getContactBeanList()
 	{
 		if( contactIdMap==null) return null;
@@ -176,9 +177,9 @@ public class ChooseContacts extends ActionBarActivity{
 	}
 
 	/**
-	 * 为ListView填充数据
-	 * @param date
-	 * @return
+	 * 为ListView填充数据排序
+	 * @param 原始通讯录
+	 * @return 排序后的通讯录
 	 */
 	private List<ContactBean> filledData(List<ContactBean> date){
 		List<ContactBean> mSortList = new ArrayList<ContactBean>();
@@ -224,6 +225,9 @@ public class ChooseContacts extends ActionBarActivity{
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/**
+	 * 全选或者全不选
+	 */
 	private void selected_all()
 	{
 		for (int k=0; k<SourceDateList.size(); k++) 
@@ -238,12 +242,19 @@ public class ChooseContacts extends ActionBarActivity{
 		select_all = !select_all;
 	}
 	
+	/**
+	 * 刷新列表
+	 * @param counter
+	 */
 	private void updateListView(int counter)
 	{
 		hint.setText("共选择了: "+counter+"人");
 		adapter.updateListView(SourceDateList);
 	}
 	
+	/**
+	 * 整理回调数据
+	 */
 	private void onChoose()
 	{
 		List<String> selected_number_list = new ArrayList<String>();
@@ -271,6 +282,12 @@ public class ChooseContacts extends ActionBarActivity{
 		exit(selected_name_list_r,selected_number_list_r, selected_contactId_list_r);
 	}
 	
+	/**
+	 * 退出activity
+	 * @param selected_name_list
+	 * @param selected_number_list
+	 * @param selected_contactId_list
+	 */
 	public void exit(String []selected_name_list, String []selected_number_list, int []selected_contactId_list)
 	{
 		Intent intent = new Intent();

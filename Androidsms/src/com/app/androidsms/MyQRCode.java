@@ -18,8 +18,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+/**
+ * 我的二维码
+ * @author luo-PC
+ *
+ */
 public class MyQRCode extends ActionBarActivity{
 	private final static String TAG = MyQRCode.class.getSimpleName();
 	private ImageView myqrcode;
@@ -51,45 +55,38 @@ public class MyQRCode extends ActionBarActivity{
 			String phone = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_PHONE);
 			
 			try {
-				if( name.length()!=0 && phone.length()!=0)
-				{
+				if( name.length()!=0 && phone.length()!=0){
 					Log.i(TAG, "name = "+name+" phone= "+phone);
 					bm = Create2DCode(name + Constants.STRING_DIVIDER + phone);
 				}
-				
 			} catch (WriterException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 			return bm;
 		}
 		
 		@Override
 		protected void onPostExecute(Bitmap result) {
-			if( result!=null)
-			{
+			if( result!=null){
 				scan_hint.setText( getResources().getString(R.string.scan_hint));
 				myqrcode.setImageBitmap(result);
-			}
-			else
-			{
+			}else{
 				scan_hint.setText( getResources().getString(R.string.scan_notset));
 				myqrcode.setImageBitmap(null);
 			}
 		}
-		
 	}
 	
 	/**
 	 * 用字符串生成二维码
 	 * @param str
-	 * @return
+	 * @return Bitmap
 	 * @throws WriterException
 	 */
 	public Bitmap Create2DCode(String str) throws WriterException {
 		//生成二维矩阵,编码时指定大小,不要生成了图片以后再进行缩放,这样会模糊导致识别失败
 		Hashtable<EncodeHintType,String> hints = new Hashtable<EncodeHintType,String>();
+		//设置编码，避免中文乱码
         hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
         
 		float density = getResources().getDisplayMetrics().density;
@@ -112,7 +109,6 @@ public class MyQRCode extends ActionBarActivity{
 	
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		finish();
 		overridePendingTransition(R.anim.zoom_in,
 			R.anim.slide_right_out);

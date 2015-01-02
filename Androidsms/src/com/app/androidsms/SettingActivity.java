@@ -4,7 +4,6 @@ import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.UserInfoPref;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -14,6 +13,11 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+/**
+ * 设置页面
+ * @author luo-PC
+ *
+ */
 public class SettingActivity extends ActionBarActivity{
 	private EditText nameET, phoneET;
 	private String name, phone;
@@ -58,6 +62,9 @@ public class SettingActivity extends ActionBarActivity{
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/**
+	 * 获取已经存在的用户信息
+	 */
 	private void getPref()
 	{
 		name = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_NAME);
@@ -66,6 +73,10 @@ public class SettingActivity extends ActionBarActivity{
 		phoneET.setText(phone);
 	}
 	
+	/**
+	 * 设置用户信息
+	 * @return boolean
+	 */
 	private boolean setPref()
 	{
 		name = nameET.getText().toString().trim();

@@ -22,10 +22,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * 群发短信
+ * @author luo-PC
+ *
+ */
 public class MultiMessage extends ActionBarActivity{
-	
 	private List<NameNumberPair> mNameNumberPair;
 	private int []selected_contactId_list = null;
+	
 	private ListView selectedLV;
 	private SelectedAdapter mSelectedAdapter;
 	private EditText multi_msg_content;
@@ -52,7 +57,6 @@ public class MultiMessage extends ActionBarActivity{
 			
 			@Override
 			public void OnSendTaskDone(List<NameNumberPair> mNameNumberPairList) {
-				// TODO Auto-generated method stub
 				resetHint();
 			}
 		});
@@ -85,6 +89,9 @@ public class MultiMessage extends ActionBarActivity{
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/**
+	 * 点击群发短信
+	 */
 	private void multiSend()
 	{
 		String content = multi_msg_content.getText().toString().trim();
@@ -98,15 +105,21 @@ public class MultiMessage extends ActionBarActivity{
 		}
 	}
 	
+	/**
+	 * 设置提示
+	 * @param hint
+	 */
 	private void setHint(String hint)
 	{
 		hint = hint==null?"":hint;
-		
 		multi_msg_content.setVisibility(View.GONE);
 		hintTV.setVisibility(View.VISIBLE);
 		hintTV.setText("提示: "+hint);
 	}
 	
+	/**
+	 * reset 提示
+	 */
 	private void resetHint()
 	{
 		multi_msg_content.setVisibility(View.VISIBLE);
@@ -128,8 +141,7 @@ public class MultiMessage extends ActionBarActivity{
 				return;
 			}
 			
-			for( int k=0; k<selected_name_list.length; k++)
-			{
+			for( int k=0; k<selected_name_list.length; k++){
 				NameNumberPair item = new NameNumberPair(selected_name_list[k], selected_number_list[k]);
 				mNameNumberPair.add(item);
 			}
@@ -139,7 +151,6 @@ public class MultiMessage extends ActionBarActivity{
 	
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		finish();
 		overridePendingTransition(R.anim.zoom_in,
 			R.anim.slide_right_out);
