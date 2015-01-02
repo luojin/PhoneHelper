@@ -22,7 +22,7 @@ public class NameNumberPair {
 		this.name = name;
 	}
 	public String getNumber() {
-		return number;
+		return number==null?"":number;
 	}
 	public void setNumber(String number) {
 		this.number = number;

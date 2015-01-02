@@ -60,7 +60,10 @@ public class ContactsController {
 			for (int i = 0; i < cursor.getCount(); i++) {
 				cursor.moveToPosition(i);
 				String name = cursor.getString(1);
-				String number = cursor.getString(2).replace(" ", "");
+				String number = cursor.getString(2);
+				if( number!=null )
+					number = number.replace(" ", "");
+				
 				String sortKey = cursor.getString(3);
 				int contactId = cursor.getInt(4);
 				Long photoId = cursor.getLong(5);

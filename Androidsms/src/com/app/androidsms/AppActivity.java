@@ -109,7 +109,8 @@ public class AppActivity extends Activity{
 		mSMSController.setOnSendTaskDoneReceiver(new SendTaskDone() {
 			@Override
 			public void OnSendTaskDone(List<NameNumberPair> mNameNumberPairList) {
-				// TODO Auto-generated method stub
+				if( mNameNumberPairList==null ) return;
+				
 				String names = "";
 				for( int m=0; m<mNameNumberPairList.size(); m++)
 				{
