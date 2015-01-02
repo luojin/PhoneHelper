@@ -3,8 +3,8 @@ package com.app.androidsms.util;
 import java.util.Comparator;
 
 /**
- * 
- * @author xiaanming
+ * ×Ö·û±È½Ïº¯Êý
+ * @author luo-PC
  *
  */
 public class PinyinComparator implements Comparator<ContactBean> {

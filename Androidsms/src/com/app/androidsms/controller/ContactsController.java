@@ -41,6 +41,9 @@ public class ContactsController {
 		getPhoneContacts();
 	}
 	
+	/**
+	 * 获取通讯录列表
+	 */
 	private void getPhoneContacts() {
         ContentResolver resolver = mContext.getContentResolver();
         String[] projection = { ContactsContract.CommonDataKinds.Phone._ID,

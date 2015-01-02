@@ -1,10 +1,8 @@
 package com.app.androidsms.adapter;
 
 import java.util.List;
-
 import com.app.androidsms.R;
 import com.app.androidsms.util.NameNumberPair;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +10,16 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+/**
+ * 在通讯录中已经选择的用户
+ * @author luo-PC
+ *
+ */
 public class SelectedAdapter extends BaseAdapter{
 	private Context mContext;
 	private List<NameNumberPair> mList;
 	
-	public SelectedAdapter(Context cxt, List<NameNumberPair> list)
-	{
+	public SelectedAdapter(Context cxt, List<NameNumberPair> list){
 		mContext = cxt;
 		mList = list;
 	}

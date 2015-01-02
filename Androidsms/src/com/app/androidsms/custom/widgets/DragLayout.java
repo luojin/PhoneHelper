@@ -18,6 +18,11 @@ import android.widget.RelativeLayout;
 import com.app.androidsms.R;
 import com.nineoldandroids.view.ViewHelper;
 
+/**
+ * ÍÏ¶¯²¼¾Ö
+ * @author luo-PC
+ *
+ */
 public class DragLayout extends FrameLayout {
 
     private boolean isShowShadow = true;

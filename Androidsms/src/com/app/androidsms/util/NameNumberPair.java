@@ -1,5 +1,10 @@
 package com.app.androidsms.util;
 
+/**
+ * Name Number Struct
+ * @author luo-PC
+ *
+ */
 public class NameNumberPair {
 	String name;
 	String number;

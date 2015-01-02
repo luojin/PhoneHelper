@@ -1,7 +1,11 @@
 package com.app.androidsms.util;
 
+/**
+ * 通讯录每个用户信息
+ * @author luo-PC
+ *
+ */
 public class ContactBean {
-
 	private int contactId;
 	private String desplayName;
 	private String phoneNum;

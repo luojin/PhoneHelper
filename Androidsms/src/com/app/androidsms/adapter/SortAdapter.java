@@ -1,10 +1,8 @@
 package com.app.androidsms.adapter;
 
 import java.util.List;
-
 import com.app.androidsms.R;
 import com.app.androidsms.util.ContactBean;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +12,11 @@ import android.widget.CheckBox;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+/**
+ * 排序后的通讯录列表Adapter
+ * @author luo-PC
+ *
+ */
 public class SortAdapter extends BaseAdapter implements SectionIndexer{
 	private List<ContactBean> list = null;
 	private Context mContext;
@@ -77,15 +80,12 @@ public class SortAdapter extends BaseAdapter implements SectionIndexer{
 		return view;
 	}
 	
-
-
 	final static class ViewHolder {
 		TextView tvLetter;
 		TextView tvTitle;
 		TextView tvNumber;
 		CheckBox cbSelect;
 	}
-
 
 	/**
 	 * 根据ListView的当前位置获取分类的首字母的Char ascii值
@@ -105,15 +105,14 @@ public class SortAdapter extends BaseAdapter implements SectionIndexer{
 				return i;
 			}
 		}
-		
 		return -1;
 	}
 	
 	/**
 	 * 提取英文的首字母，非英文字母用#代替。
 	 * 
-	 * @param str
-	 * @return
+	 * @param String
+	 * @return String
 	 */
 	private String getAlpha(String str) {
 		String  sortStr = str.trim().substring(0, 1).toUpperCase();

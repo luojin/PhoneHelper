@@ -13,6 +13,11 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.ImageView;
 
+/**
+ * Ô­ÐÍ°´Å¥
+ * @author luo-PC
+ *
+ */
 public class CircleButton extends ImageView {
 
 	private static final int PRESSED_COLOR_LIGHTUP = 255 / 25;

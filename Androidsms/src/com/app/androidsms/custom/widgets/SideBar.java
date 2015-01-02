@@ -13,6 +13,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+/**
+ * 通讯录列表右侧快速滑动
+ * @author luo-PC
+ *
+ */
 public class SideBar extends View {
 	// 触摸事件
 	private OnTouchingLetterChangedListener onTouchingLetterChangedListener;

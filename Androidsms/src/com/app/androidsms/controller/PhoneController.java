@@ -42,6 +42,9 @@ public class PhoneController {
 		initValue(); 
 	}
 	
+	/**
+	 * 初始化
+	 */
 	private void initValue()
 	{
 		telephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);  
@@ -52,10 +55,12 @@ public class PhoneController {
 		} catch (Exception e) {
 		            e.printStackTrace();
 		}
-        
         setPhoneListener();
 	}
 	
+	/**
+	 * 设置监听器，回调函数
+	 */
 	private void setPhoneListener()
     {
     	if( phoneListener==null)
@@ -71,9 +76,7 @@ public class PhoneController {
 		            		try {
 								iTelephony.endCall();
 								whenComingCall( number);
-								//send message
 							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 	            		}else if( inWhiteList(number) ){
@@ -87,8 +90,7 @@ public class PhoneController {
 	            		//CALL_STATE_IDLE 是拿不到电话号码的
 	            		whenEndCall();
 	            		
-	            		if( !isMonitoring() )
-	            		{
+	            		if( !isMonitoring() ){
 	            			//if白名单的来电, 恢复情景模式
 	            			ProfilesController.get(mContext.getApplicationContext()).resetProfile();
 	            		}
@@ -103,29 +105,52 @@ public class PhoneController {
         telephonyManager.listen(phoneListener, PhoneStateListener.LISTEN_CALL_STATE);  
     }
 	
+	/**
+	 * 判断是否在白名单内
+	 * @param number
+	 * @return boolean
+	 */
 	private boolean inWhiteList(String number)
 	{
 		return WhiteListManager.get(mContext).getPrefName(number)!=null;
 	}
 
+	/**
+	 * 是否监听模式
+	 * @return boolean
+	 */
 	public boolean isMonitoring() {
 		return isMonitoring;
 	}
 
+	/**
+	 * 设置监听模式
+	 * @param isMonitoring
+	 */
 	public void setMonitoring(boolean isMonitoring) {
 		this.isMonitoring = isMonitoring;
 	}
 	
+	/**
+	 * 设置监听器，回调函数
+	 * @param mOnEndCall
+	 */
 	public void setmOnEndCall(OnCallChange mOnEndCall) {
 		this.mOnCallChange = mOnEndCall;
 	}
 	
-	private void whenComingCall(String inComingNumber)
-	{
+	/**
+	 * 来电回调
+	 * @param inComingNumber
+	 */
+	private void whenComingCall(String inComingNumber){
 		if( mOnCallChange!=null)
 			mOnCallChange.OnComingCall(inComingNumber);
 	}
 	
+	/**
+	 * 结束来电回调
+	 */
 	private void whenEndCall()
 	{
 		if( mOnCallChange!=null)

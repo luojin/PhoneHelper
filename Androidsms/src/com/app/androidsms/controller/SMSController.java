@@ -22,16 +22,16 @@ import android.widget.Toast;
  */
 public class SMSController {
 	private static String TAG = SMSController.class.getSimpleName();
+	
+	private String message;
+	private int sendIndex=0;
 	private Context mContext;
 	private static SMSController sInstance;
-	private String SENT = "SMS_SENT", DELIVERED = "SMS_DELIVERED";
 	private PendingIntent sentPI, deliveredPI;
-	private BroadcastReceiver smsSentReceiver=null, smsDeliveredReceiver=null;
-	private String message;
 	private List<NameNumberPair> mNameNumberList;
-	private int sendIndex=0;
-//	private SendTaskDone mSendTaskDone=null;
 	private List<SendTaskDone> mSendTaskDoneList = null;
+	private String SENT = "SMS_SENT", DELIVERED = "SMS_DELIVERED";
+	private BroadcastReceiver smsSentReceiver=null, smsDeliveredReceiver=null;
 	
 	public static synchronized SMSController get(Context cxt) {
         if (sInstance == null) 
@@ -39,8 +39,7 @@ public class SMSController {
         return sInstance;
     }
 	
-	private SMSController(Context cxt)
-	{
+	private SMSController(Context cxt){
 		this.mContext = cxt;
 		sentPI = PendingIntent.getBroadcast(mContext, 0,
 				new Intent(SENT), 0);
@@ -57,13 +56,16 @@ public class SMSController {
 	 * @param name
 	 * @param msg
 	 */
-	private void setValue(int index, List<NameNumberPair> list, String msg)
-	{
+	private void setValue(int index, List<NameNumberPair> list, String msg){
 		sendIndex=index; this.mNameNumberList=list; this.message=msg;
 	}
 	
-	public void sendSMSMulti(List<NameNumberPair> nameNumberList, String msg)
-	{
+	/**
+	 * 群发短信
+	 * @param nameNumberList
+	 * @param msg
+	 */
+	public void sendSMSMulti(List<NameNumberPair> nameNumberList, String msg){
 		if( nameNumberList==null|| nameNumberList.size()==0 || msg==null || msg.trim().length()==0) 
 		{
 			Log.i(TAG, "sendSMSMulti value empty"); 
@@ -75,12 +77,15 @@ public class SMSController {
 		sendSMS(nameNumberList.get(sendIndex),  message);
 	}
 	
-	//sends an SMS message to another device
+	/**
+	 * sends an SMS message to another device
+	 * @param item
+	 * @param message
+	 */
 	private void sendSMS(NameNumberPair item, String message)
 	{
 		Log.i(TAG, "sendSMS "+item.getNumber()+" "+message);
-		if( item==null || "".equals( item.getNumber()) || "".equals(message) ) 
-		{
+		if( item==null || "".equals( item.getNumber()) || "".equals(message) ) {
 			Log.i(TAG, "sendSMS value empty"); 
 			SendTaskDone(null);
 			return;
@@ -93,7 +98,9 @@ public class SMSController {
 		smsManager.sendTextMessage(item.getNumber(), null, message, sentPI, deliveredPI);
 	}
 	
-	//register BroadcastReceiver
+	/**
+	 * register BroadcastReceiver
+	 */
 	public void registerSMSReceiver()
 	{
 		Log.i(TAG, "registerSMSReceiver");
@@ -110,8 +117,7 @@ public class SMSController {
 						setValue(0,null,null);
 					}
 					
-					switch (getResultCode())
-					{
+					switch (getResultCode()){
 					case Activity.RESULT_OK:
 						Toast.makeText(mContext, "SMS sent",
 								Toast.LENGTH_SHORT).show();
@@ -157,13 +163,14 @@ public class SMSController {
 				}
 			}; 
 		}
-
 		//---register the two BroadcastReceivers---
 		mContext.registerReceiver(smsDeliveredReceiver, new IntentFilter(DELIVERED));      
 		mContext.registerReceiver(smsSentReceiver, new IntentFilter(SENT));
 	}
 	
-	//unregister BroadcastReceiver
+	/**
+	 * unregister BroadcastReceiver
+	 */
 	public void unregisterSMSReceiver()
 	{
 		Log.i(TAG, "unregisterSMSReceiver");
@@ -172,14 +179,21 @@ public class SMSController {
 		mContext.unregisterReceiver(smsDeliveredReceiver);    
 	}
 	
-	public void setOnSendTaskDoneReceiver(SendTaskDone obj)
-	{
+	/**
+	 * 设置发送完毕回调
+	 * @param obj
+	 */
+	public void setOnSendTaskDoneReceiver(SendTaskDone obj){
 		if( mSendTaskDoneList==null )
 			mSendTaskDoneList =  new ArrayList<SMSController.SendTaskDone>();
 		
 		mSendTaskDoneList.add(obj);
 	}
 	
+	/**
+	 * 发送完毕回调
+	 * @param mNameNumberPairList
+	 */
 	private void SendTaskDone(List<NameNumberPair> mNameNumberPairList)
 	{
 		if( mSendTaskDoneList==null ) return;

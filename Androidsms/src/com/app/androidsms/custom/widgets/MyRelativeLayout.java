@@ -7,6 +7,11 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
+/**
+ * 自定义相对布局
+ * @author luo-PC
+ *
+ */
 public class MyRelativeLayout extends RelativeLayout {
     private DragLayout dl;
 

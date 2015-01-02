@@ -12,10 +12,10 @@ import android.util.Log;
  */
 public class ProfilesController {
 	private static String TAG = ProfilesController.class.getSimpleName();
-	private static ProfilesController sInstance;
 	private Context mContext;
-	private AudioManager mAudioManager;
 	private Vibrator vibrator;
+	private AudioManager mAudioManager;
+	private static ProfilesController sInstance;
 	long []vibratorPattern = {1000,1000}; //stop start stop start ms毫秒为单位的停止和开始震动
 
 	private int originVolume=-1, originMode;
@@ -35,8 +35,7 @@ public class ProfilesController {
 	/**
 	 * 获取当前情景模式
 	 */
-	public void getInitProfile()
-	{
+	public void getInitProfile(){
 		originVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_RING);
 		originMode = mAudioManager.getRingerMode();
 	}
@@ -44,8 +43,7 @@ public class ProfilesController {
 	/**
 	 * 恢复情景模式
 	 */
-	public void resetProfile()
-	{
+	public void resetProfile(){
 		if( originVolume==-1) return;
 		
 		Log.i(TAG, "reset profile when ending call");
@@ -57,8 +55,7 @@ public class ProfilesController {
 	/**
 	 * 声音+震动
 	 */
-    public void RingAndVibrate() 
-    {
+    public void RingAndVibrate() {
     	Log.i(TAG, "change profile when coming call");
     	setVolume( mAudioManager.getStreamMaxVolume(AudioManager.STREAM_RING) );
     	startVibrator();
@@ -67,8 +64,7 @@ public class ProfilesController {
 	/**
 	 * 设置音量大小
 	 */
-	private void setVolume(int index)
-	{
+	private void setVolume(int index){
 		//streamType铃声类型, index音量大小, flags
 		Log.i(TAG, "volume is "+index);
 		mAudioManager.setStreamVolume(AudioManager.STREAM_RING, index, 0);
@@ -78,16 +74,14 @@ public class ProfilesController {
 	 * 开始震动
 	 * from index 0 to repeat the pattern
 	 */
-	private void startVibrator()
-	{
+	private void startVibrator(){
 		vibrator.vibrate(vibratorPattern, 0);  
 	}
 	
 	/**
 	 * 取消震动
 	 */
-	private void stopVibrator()
-	{
+	private void stopVibrator(){
 		vibrator.cancel();
 	}
 	
