@@ -33,6 +33,8 @@ public class WhiteListManager {
 		if( item==null || item.getName()==null || item.getNumber()==null )return false;
 		
 		mWhiteListPref.edit().putString(item.getNumber(), item.getName()).commit();
+		Log.i(TAG, "name list size = "+mWhiteListPref.getAll().size());
+
 		return true;
 	}
 
