@@ -3,11 +3,15 @@ package com.app.androidsms.controller;
 import java.lang.reflect.Method;
 
 import com.android.internal.telephony.ITelephony;
+import com.app.androidsms.util.Constants;
+import com.app.androidsms.util.WhiteListManager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.RemoteException;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 /**
  * 控制来电拦截与否
@@ -72,7 +76,7 @@ public class PhoneController {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-	            		}else{
+	            		}else if( inWhiteList(number) ){
 	            			//if白名单的来电，自动切换情景模式
 	            			ProfilesController.get(mContext.getApplicationContext()).getInitProfile();
 	            			ProfilesController.get(mContext.getApplicationContext()).RingAndVibrate();
@@ -80,7 +84,8 @@ public class PhoneController {
 	            		break;
 		            //the calling is ended
 	            	case TelephonyManager.CALL_STATE_IDLE:
-	            		whenEndCall(number);
+	            		//CALL_STATE_IDLE 是拿不到电话号码的
+	            		whenEndCall();
 	            		
 	            		if( !isMonitoring() )
 	            		{
@@ -97,6 +102,11 @@ public class PhoneController {
 
         telephonyManager.listen(phoneListener, PhoneStateListener.LISTEN_CALL_STATE);  
     }
+	
+	private boolean inWhiteList(String number)
+	{
+		return WhiteListManager.get(mContext).getPrefName(number)!=null;
+	}
 
 	public boolean isMonitoring() {
 		return isMonitoring;
@@ -116,10 +126,10 @@ public class PhoneController {
 			mOnCallChange.OnComingCall(inComingNumber);
 	}
 	
-	private void whenEndCall(String inComingNumber)
+	private void whenEndCall()
 	{
 		if( mOnCallChange!=null)
-			mOnCallChange.OnCallOffhook(inComingNumber);
+			mOnCallChange.OnCallOffhook();
 	}
 
 	/**
@@ -128,7 +138,7 @@ public class PhoneController {
 	 */
 	public interface OnCallChange{
 		public void OnComingCall(String inComingNumber);
-		public void OnCallOffhook(String offhookNumber);
+		public void OnCallOffhook();
 	}
 	
 }

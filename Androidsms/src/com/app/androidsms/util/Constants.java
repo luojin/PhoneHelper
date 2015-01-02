@@ -13,6 +13,7 @@ public class Constants {
 	public final static String PREF_USER_INFO = "PREF_USER_INFO";
 	public final static String PREF_NAME = "PREF_NAME";
 	public final static String PREF_PHONE = "PREF_PHONE";
+	public final static String PREF_WHITE_LIST = "PREF_WHITE_LIST";
 	
 	public final static int SCANNIN_GREQUEST_CODE = 1000;
 	public final static int GET_SETTINGS = 1001;

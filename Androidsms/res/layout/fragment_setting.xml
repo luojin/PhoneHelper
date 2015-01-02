@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:hint="your name"
+        android:textSize="15sp"
         android:layout_marginBottom="20dp"/>
     
      <EditText 
@@ -19,6 +20,7 @@
         android:layout_height="wrap_content"
         android:inputType="phone"
         android:singleLine="true"
+        android:textSize="15sp"
         android:hint="your phone number"/>
 
 </LinearLayout>

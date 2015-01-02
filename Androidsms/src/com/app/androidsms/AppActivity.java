@@ -1,6 +1,8 @@
 package com.app.androidsms;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ import com.app.androidsms.custom.widgets.DragLayout;
 import com.app.androidsms.custom.widgets.DragLayout.DragListener;
 import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.NameNumberPair;
+import com.app.androidsms.util.WhiteListManager;
 import com.nineoldandroids.view.ViewHelper;
 
 import android.app.Activity;
@@ -124,7 +127,7 @@ public class AppActivity extends Activity{
 			@Override
 			public void OnComingCall(String inComingNumber) {
 				// TODO Auto-generated method stub
-				setLogger(inComingNumber+" Intercepted");
+				setLogger("拦截来电: " + inComingNumber);
 				
 				if( mPhoneController.isMonitoring() ){
 					mNumberNameMap = mContactsController.getNumberNameMap();
@@ -138,14 +141,12 @@ public class AppActivity extends Activity{
 						msgContent = "我现在有事，迟点给你回电话吧。";
 					
 					mNameNumberPair.add( new NameNumberPair(inComingName, inComingNumber));
-					mSMSController.sendSMSMulti(mNameNumberPair, msgContent);
+					//mSMSController.sendSMSMulti(mNameNumberPair, msgContent);
 				}
 			}
 
 			@Override
-			public void OnCallOffhook(String offhookNumber) {
-				if( mPhoneController.isMonitoring())
-					setLogger("来电结束：" + offhookNumber);
+			public void OnCallOffhook() {
 			}
 		});
 		
@@ -243,6 +244,12 @@ public class AppActivity extends Activity{
 	protected void onResume() {
 		super.onResume();
 		shake();
+		
+		if( mContactsController.getNumberNameMap()==null ){
+			controlBtn.setVisibility(View.INVISIBLE);
+		}else{
+			controlBtn.setVisibility(View.VISIBLE);
+		}
 	}
 
 	/**
@@ -263,9 +270,15 @@ public class AppActivity extends Activity{
 		String setText = logTV.getText().toString();
 		String []newLines = newLine.split("///");
 		for(int k=0; k<newLines.length; k++)
-			setText+= ("\n"+newLines[k]);
+			setText = getCurrentTime() + ": " +newLines[k] + "\n" + setText;
 			
 		logTV.setText( setText);
+	}
+	
+	private String getCurrentTime()
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+		return sdf.format(new Date());
 	}
 	
 	/**
@@ -291,9 +304,11 @@ public class AppActivity extends Activity{
         switch (requestCode) {
 		case Constants.SCANNIN_GREQUEST_CODE:
 			if(resultCode == RESULT_OK){
-				Bundle bundle = data.getExtras();
+//				Bundle bundle = data.getExtras();
 				//显示扫描到的内容
-				setLogger("二维码内容: " + bundle.getString("result") );
+//				setLogger("二维码内容: " + bundle.getString("result") );
+				NameNumberPair item = new NameNumberPair("罗劲", "15902090538");
+				WhiteListManager.get(getApplicationContext()).addPrefPair(item);
 			}
 			break;
 		case Constants.GET_SETTINGS:

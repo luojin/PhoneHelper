@@ -3,6 +3,7 @@ package com.app.androidsms.controller;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Vibrator;
+import android.util.Log;
 
 /**
  * 控制情景模式
@@ -17,7 +18,7 @@ public class ProfilesController {
 	private Vibrator vibrator;
 	long []vibratorPattern = {1000,1000}; //stop start stop start ms毫秒为单位的停止和开始震动
 
-	private int originVolume, originMode;
+	private int originVolume=-1, originMode;
 	
 	public static synchronized ProfilesController get(Context cxt) {
         if (sInstance == null) 
@@ -45,6 +46,9 @@ public class ProfilesController {
 	 */
 	public void resetProfile()
 	{
+		if( originVolume==-1) return;
+		
+		Log.i(TAG, "reset profile when ending call");
 		stopVibrator();
 		setVolume(originVolume);
 		mAudioManager.setRingerMode(originMode);
@@ -55,9 +59,9 @@ public class ProfilesController {
 	 */
     public void RingAndVibrate() 
     {
-    	setVolume(100);
+    	Log.i(TAG, "change profile when coming call");
+    	setVolume( mAudioManager.getStreamMaxVolume(AudioManager.STREAM_RING) );
     	startVibrator();
-    	mAudioManager.setRingerMode(originMode);
     }
 	
 	/**
@@ -66,6 +70,7 @@ public class ProfilesController {
 	private void setVolume(int index)
 	{
 		//streamType铃声类型, index音量大小, flags
+		Log.i(TAG, "volume is "+index);
 		mAudioManager.setStreamVolume(AudioManager.STREAM_RING, index, 0);
 	}
 	
