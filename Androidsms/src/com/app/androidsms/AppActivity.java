@@ -18,6 +18,7 @@ import com.app.androidsms.custom.widgets.DragLayout;
 import com.app.androidsms.custom.widgets.DragLayout.DragListener;
 import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.NameNumberPair;
+import com.app.androidsms.util.UserInfoPref;
 import com.app.androidsms.util.WhiteListManager;
 import com.nineoldandroids.view.ViewHelper;
 
@@ -55,7 +56,6 @@ public class AppActivity extends Activity{
 	private String name, phone;
 	private TextView nameTV, phoneTV;
 	private int mCurrentPosition = 0;
-	private SharedPreferences mUserPrefs = null;
 	private Map<String, String> mNumberNameMap;
 	
 	@Override
@@ -287,13 +287,11 @@ public class AppActivity extends Activity{
 	 */
 	private void getUserInfo()
 	{
-		if( mUserPrefs==null)
-			mUserPrefs = getSharedPreferences(Constants.PREF_USER_INFO,MODE_PRIVATE);
-		
-		name = mUserPrefs.getString(Constants.PREF_NAME, "name");
-		phone = mUserPrefs.getString(Constants.PREF_PHONE, "phone");
+		name = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_NAME);
+		phone = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_PHONE);
 		name = name==""?"name":name;
 		phone = phone==""?"phone":phone;
+		
 		nameTV.setText(name);
 		phoneTV.setText(phone);
 	}
@@ -304,11 +302,19 @@ public class AppActivity extends Activity{
         switch (requestCode) {
 		case Constants.SCANNIN_GREQUEST_CODE:
 			if(resultCode == RESULT_OK){
-//				Bundle bundle = data.getExtras();
-				//显示扫描到的内容
-//				setLogger("二维码内容: " + bundle.getString("result") );
-				NameNumberPair item = new NameNumberPair("罗劲", "15902090538");
-				WhiteListManager.get(getApplicationContext()).addPrefPair(item);
+				Bundle bundle = data.getExtras();
+				String result = bundle.getString("result");
+				if( result==null ) return;
+				
+				setLogger("二维码内容: " + result );
+				String []addItem = result.split(Constants.STRING_DIVIDER);
+				if( addItem.length==2)
+				{
+					//name + Constants.STRING_DIVIDER + phone
+					NameNumberPair item = new NameNumberPair(addItem[0], addItem[1]);
+					WhiteListManager.get(getApplicationContext()).addPrefPair(item);
+					setLogger("授权给： " + addItem[0] );
+				}
 			}
 			break;
 		case Constants.GET_SETTINGS:

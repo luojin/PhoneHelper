@@ -1,22 +1,26 @@
 package com.app.androidsms;
 
+import com.app.androidsms.util.Constants;
+import com.app.androidsms.util.UserInfoPref;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
-
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MyQRCode extends ActionBarActivity{
+	private final static String TAG = MyQRCode.class.getSimpleName();
 	private ImageView myqrcode;
+	private TextView scan_hint;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,7 @@ public class MyQRCode extends ActionBarActivity{
 	    actionBar.setTitle(R.string.my_qrcode_title);
 		
 		myqrcode = (ImageView) findViewById(R.id.myqrcode);
+		scan_hint = (TextView) findViewById(R.id.hint);
 		
 		new GetQRCodeTask().execute();
 	}
@@ -39,8 +44,16 @@ public class MyQRCode extends ActionBarActivity{
 		protected Bitmap doInBackground(Object... params) {
 			// TODO Auto-generated method stub
 			Bitmap bm = null;
+			String name = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_NAME);
+			String phone = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_PHONE);
+			
 			try {
-				 bm = Create2DCode("15902090538");
+				if( name.length()!=0 && phone.length()!=0)
+				{
+					Log.i(TAG, "name = "+name+" phone= "+phone);
+					bm = Create2DCode(name + Constants.STRING_DIVIDER + phone);
+				}
+				
 			} catch (WriterException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -52,7 +65,15 @@ public class MyQRCode extends ActionBarActivity{
 		@Override
 		protected void onPostExecute(Bitmap result) {
 			if( result!=null)
+			{
+				scan_hint.setText( getResources().getString(R.string.scan_hint));
 				myqrcode.setImageBitmap(result);
+			}
+			else
+			{
+				scan_hint.setText( getResources().getString(R.string.scan_notset));
+				myqrcode.setImageBitmap(null);
+			}
 		}
 		
 	}

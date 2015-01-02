@@ -1,7 +1,5 @@
 package com.app.androidsms.util;
 
-import com.app.androidsms.controller.PhoneController;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;

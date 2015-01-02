@@ -1,6 +1,7 @@
 package com.app.androidsms;
 
 import com.app.androidsms.util.Constants;
+import com.app.androidsms.util.UserInfoPref;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,9 +12,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class SettingActivity extends ActionBarActivity{
-	private SharedPreferences mUserPrefs;
 	private EditText nameET, phoneET;
 	private String name, phone;
 	
@@ -27,7 +28,6 @@ public class SettingActivity extends ActionBarActivity{
 	    actionBar.setDisplayHomeAsUpEnabled(true);
 	    actionBar.setTitle(R.string.setting);
 		
-		mUserPrefs = getSharedPreferences(Constants.PREF_USER_INFO,MODE_PRIVATE);
 		nameET = (EditText) findViewById(R.id.name);
 		phoneET = (EditText) findViewById(R.id.phone_number);
 		
@@ -51,8 +51,8 @@ public class SettingActivity extends ActionBarActivity{
 			onBackPressed();
 			break;
 		case R.id.setting_ok:
-			setPref();
-			onBackPressed();
+			if( setPref() )
+				onBackPressed();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -60,18 +60,24 @@ public class SettingActivity extends ActionBarActivity{
 	
 	private void getPref()
 	{
-		name = mUserPrefs.getString(Constants.PREF_NAME, "");
-		phone = mUserPrefs.getString(Constants.PREF_PHONE, "");
+		name = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_NAME);
+		phone = UserInfoPref.get(getApplicationContext()).getString(Constants.PREF_PHONE);
 		nameET.setText(name);
 		phoneET.setText(phone);
 	}
 	
-	private void setPref()
+	private boolean setPref()
 	{
 		name = nameET.getText().toString().trim();
 		phone = phoneET.getText().toString().trim();
-		mUserPrefs.edit().putString(Constants.PREF_NAME, name).commit();
-		mUserPrefs.edit().putString(Constants.PREF_PHONE, phone).commit();
+		if( name.length()==0 || phone.length()==0 ){
+			Toast.makeText(getApplicationContext(), "²»ÄÜÎª¿Õ", Toast.LENGTH_SHORT).show();
+			return false;
+		}
+		
+		UserInfoPref.get(getApplicationContext()).addString(Constants.PREF_NAME, name);
+		UserInfoPref.get(getApplicationContext()).addString(Constants.PREF_PHONE, phone);
+		return true;
 	}
 	
 	@Override

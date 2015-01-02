@@ -14,6 +14,7 @@ public class Constants {
 	public final static String PREF_NAME = "PREF_NAME";
 	public final static String PREF_PHONE = "PREF_PHONE";
 	public final static String PREF_WHITE_LIST = "PREF_WHITE_LIST";
+	public final static String STRING_DIVIDER = "-=-";
 	
 	public final static int SCANNIN_GREQUEST_CODE = 1000;
 	public final static int GET_SETTINGS = 1001;
