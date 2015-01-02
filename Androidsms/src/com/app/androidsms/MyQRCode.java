@@ -1,8 +1,11 @@
 package com.app.androidsms;
 
+import java.util.Hashtable;
+
 import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.UserInfoPref;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -86,9 +89,12 @@ public class MyQRCode extends ActionBarActivity{
 	 */
 	public Bitmap Create2DCode(String str) throws WriterException {
 		//生成二维矩阵,编码时指定大小,不要生成了图片以后再进行缩放,这样会模糊导致识别失败
+		Hashtable<EncodeHintType,String> hints = new Hashtable<EncodeHintType,String>();
+        hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+        
 		float density = getResources().getDisplayMetrics().density;
 		int codeWidth = (int) (density * 300);
-		BitMatrix matrix = new MultiFormatWriter().encode(str,BarcodeFormat.QR_CODE, codeWidth, codeWidth);
+		BitMatrix matrix = new MultiFormatWriter().encode(str,BarcodeFormat.QR_CODE, codeWidth, codeWidth, hints);
 		int width = matrix.getWidth();
 		int height = matrix.getHeight();
 		//二维矩阵转为一维像素数组,也就是一直横着排了
