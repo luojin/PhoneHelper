@@ -8,11 +8,11 @@ let users use mobile phone more convenient
         扫我的二维码，女友的来电你没有借口没听到了；父母的来电不容错过；老板的来电，刻不容缓；  
         情景模式：声音，震动，无声  
 
-doc:
-   点击index.html用浏览器查看接口文档
-appcompat_v7:
-   依赖库
-Androidsms:
-   主要项目代码
-实验报告：
-   包括黑盒测试用例，用户说明
+doc:  
+   点击index.html用浏览器查看接口文档  
+appcompat_v7:  
+   依赖库  
+Androidsms:  
+   主要项目代码  
+实验报告：  
+   包括黑盒测试用例，用户说明  
