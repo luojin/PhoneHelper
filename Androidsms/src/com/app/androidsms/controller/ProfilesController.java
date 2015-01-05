@@ -58,6 +58,7 @@ public class ProfilesController {
     public void RingAndVibrate() {
     	Log.i(TAG, "change profile when coming call");
     	setVolume( mAudioManager.getStreamMaxVolume(AudioManager.STREAM_RING) );
+    	mAudioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
     	startVibrator();
     }
 	

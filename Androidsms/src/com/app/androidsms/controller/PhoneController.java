@@ -9,6 +9,7 @@ import com.app.androidsms.util.WhiteListManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.RemoteException;
+import android.provider.Telephony;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -84,6 +85,10 @@ public class PhoneController {
 	            			ProfilesController.get(mContext.getApplicationContext()).getInitProfile();
 	            			ProfilesController.get(mContext.getApplicationContext()).RingAndVibrate();
 	            		}
+	            		break;
+	            	//the calling is connected
+	            	case TelephonyManager.CALL_STATE_OFFHOOK:
+	            		ProfilesController.get(mContext.getApplicationContext()).resetProfile();
 	            		break;
 		            //the calling is ended
 	            	case TelephonyManager.CALL_STATE_IDLE:
