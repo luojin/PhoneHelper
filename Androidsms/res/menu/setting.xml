@@ -3,11 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.androidsms.MainActivity" >
 
-    <item 
-        android:id="@+id/setting_ok"
-        android:title="@string/setting"
+       <item
+        android:id="@+id/clear_white_list"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_action_accept"
-        app:showAsAction="always"/>
+        android:title="@string/clear_white_list"
+        app:showAsAction="never"/>
 
 </menu>

@@ -48,5 +48,13 @@ public class WhiteListManager {
 
 		return true;
 	}
+	
+	/**
+	 * clear all white list
+	 */
+	public void clearAll()
+	{
+		mWhiteListPref.edit().clear().commit();
+	}
 
 }

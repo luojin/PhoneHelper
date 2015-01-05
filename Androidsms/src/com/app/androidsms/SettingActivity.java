@@ -2,6 +2,7 @@ package com.app.androidsms;
 
 import com.app.androidsms.util.Constants;
 import com.app.androidsms.util.UserInfoPref;
+import com.app.androidsms.util.WhiteListManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +11,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -20,6 +24,7 @@ import android.widget.Toast;
  */
 public class SettingActivity extends ActionBarActivity{
 	private EditText nameET, phoneET;
+	private Button    confirmBtn;
 	private String name, phone;
 	
 	@Override
@@ -34,6 +39,15 @@ public class SettingActivity extends ActionBarActivity{
 		
 		nameET = (EditText) findViewById(R.id.name);
 		phoneET = (EditText) findViewById(R.id.phone_number);
+		confirmBtn = (Button) findViewById(R.id.comfirm_setting);
+		confirmBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if( setPref() )
+					onBackPressed();
+			}
+		});
 		
 		getPref();
 	}
@@ -54,9 +68,9 @@ public class SettingActivity extends ActionBarActivity{
 		case android.R.id.home: 
 			onBackPressed();
 			break;
-		case R.id.setting_ok:
-			if( setPref() )
-				onBackPressed();
+		case R.id.clear_white_list:
+			WhiteListManager.get(getApplicationContext()).clearAll();
+			Toast.makeText(getApplicationContext(), "白名单已清空", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
