@@ -113,7 +113,13 @@ public class MipcaActivityCapture extends ActionBarActivity implements Callback{
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						Result result = scanningImage(photo_path);
+						//防止选择了非图片文件
+						Result result;
+						if( BitmapFactory.decodeFile(photo_path)==null )
+							result =null;
+						else
+							result = scanningImage(photo_path);
+						
 						if (result != null) {
 							Message m = mHandler.obtainMessage();
 							m.what = PARSE_BARCODE_SUC;

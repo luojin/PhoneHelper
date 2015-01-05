@@ -19,6 +19,7 @@
     </string-array>
     
     <string name="album_choose">从相册选取二维码</string>
+    <string name="qrcode_saveto_album">保存到本地相册</string>
     <string name="scan_text">将二维码放入框内, 即可自动扫描</string>
     
     <string name="choose_to_send">选人</string>

@@ -271,6 +271,8 @@ public class AppActivity extends Activity{
 	protected void onResume() {
 		super.onResume();
 		shake();
+		//reset position
+		mCurrentPosition = 0;
 		
 		if( mContactsController.getNumberNameMap()==null ){
 			controlBtn.setVisibility(View.INVISIBLE);

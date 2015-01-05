@@ -1,9 +1,18 @@
 package com.app.androidsms.util;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Random;
+
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -13,6 +22,8 @@ import android.provider.MediaStore;
 public class ImageUtil {
 	private static final String TAG = "ImageUtil";
 	private volatile static ImageUtil uniqueInstance = null;
+	private static final String PATH_SDCARD = Environment.getExternalStorageDirectory().getAbsolutePath();
+	private static final String PATH_CAMERA = PATH_SDCARD + "/DCIM/Camera";
 	
 	private ImageUtil()
 	{
@@ -161,5 +172,85 @@ public class ImageUtil {
   	private static boolean isMediaDocument(Uri uri) {
   	    return "com.android.providers.media.documents".equals(uri.getAuthority());
   	}
+  	
+  	/**
+  	 * 获取当前时间做为文件名
+  	 * @return String
+  	 */
+  	public static String getRandomDateString() {
+        Random random = new Random(System.currentTimeMillis());
+        Date date = new Date(System.currentTimeMillis()); 
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US); 
+        String fileName = format.format(date) + String.format("%06d", Math.abs(random.nextInt()) % 100000);      
+        return fileName;
+    } 
+  	
+  	/**
+  	 * create folder
+  	 * @param folderPath
+  	 * @return folderPath
+  	 */
+  	public static String createFolder(String folderPath) {
+		File folder = new File(folderPath);
+		if (!folder.exists())
+			folder.mkdirs();
+		return folderPath;
+	}
+  	
+  	/**
+  	 * get qr_code save path
+  	 * @return path
+  	 */
+  	public static String getQRcodeSavePath() {
+		File file = new File(createFolder(PATH_CAMERA), getRandomDateString()+".jpg");
+		return file.getAbsolutePath();
+	}
+	
+  	/**
+  	 * save image bitmap 
+  	 * @param bitmap
+  	 */
+  	public static String saveImage(Bitmap bitmap) {
+  		return saveImage( bitmap,  getQRcodeSavePath());
+	}
+  	
+  	/**
+  	 * save image bitmap to specify file path
+  	 * @param bitmap
+  	 * @param filePath
+  	 */
+  	public static String saveImage(Bitmap bitmap, String filePath) {
+		try {
+            FileOutputStream fos = new FileOutputStream(filePath);    		
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+        	filePath = null;
+        	e.printStackTrace();
+        }finally{
+        }
+		
+		return filePath;
+	}
+  	
+  	/**
+	 * scan photo in album
+	 * in this way the user can view saved photo in album
+	 * @param mContext
+	 * @param filePath
+	 */
+	public static void scanPhotos(Context mContext, String filePath) 
+    {
+    	if( filePath==null)return;
+    	
+		 Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+		 File file = new File(filePath);
+		 if( file==null ) return;
+		 
+		 Uri uri = Uri.fromFile( file);
+		 intent.setData(uri);
+		 mContext.sendBroadcast(intent);
+	}
 
 }

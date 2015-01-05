@@ -3,21 +3,25 @@ package com.app.androidsms;
 import java.util.Hashtable;
 
 import com.app.androidsms.util.Constants;
+import com.app.androidsms.util.ImageUtil;
 import com.app.androidsms.util.UserInfoPref;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * 我的二维码
@@ -28,6 +32,7 @@ public class MyQRCode extends ActionBarActivity{
 	private final static String TAG = MyQRCode.class.getSimpleName();
 	private ImageView myqrcode;
 	private TextView scan_hint;
+	private Bitmap     myqrcodeBM;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,11 +73,13 @@ public class MyQRCode extends ActionBarActivity{
 		@Override
 		protected void onPostExecute(Bitmap result) {
 			if( result!=null){
+				myqrcodeBM = result;
 				scan_hint.setText( getResources().getString(R.string.scan_hint));
 				myqrcode.setImageBitmap(result);
 			}else{
 				scan_hint.setText( getResources().getString(R.string.scan_notset));
 				myqrcode.setImageBitmap(null);
+				myqrcodeBM = null;
 			}
 		}
 	}
@@ -100,6 +107,8 @@ public class MyQRCode extends ActionBarActivity{
 			for (int x = 0; x < width; x++) 
 				if(matrix.get(x, y))
 					pixels[y * width + x] = 0xff000000;
+				else
+					pixels[y * width + x] = 0xffffffff;
 		
 		Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		//通过像素数组生成bitmap,具体参考api
@@ -114,6 +123,39 @@ public class MyQRCode extends ActionBarActivity{
 			R.anim.slide_right_out);
 	}
 	
+	private class SaveQRCodeTask extends AsyncTask<Object, Object, Boolean>
+	{
+		@Override
+		protected Boolean doInBackground(Object... params) {
+			if( myqrcodeBM==null)
+				return false;
+			
+			String filepath = ImageUtil.saveImage(myqrcodeBM);
+			if( filepath==null )
+				return false;
+			else
+				ImageUtil.scanPhotos(getApplicationContext(), filepath);
+			return true;
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if( result.booleanValue()==true){
+				Toast.makeText(getApplicationContext(), "已保存到相册", Toast.LENGTH_SHORT).show();
+			}else{
+				Toast.makeText(getApplicationContext(), "保存失败", Toast.LENGTH_SHORT).show();
+			}
+		}
+		
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.my_qrcode, menu);
+		return true;
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will
@@ -121,9 +163,13 @@ public class MyQRCode extends ActionBarActivity{
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch( item.getItemId() ){
 		case android.R.id.home: 
-				onBackPressed();
+			onBackPressed();
+			break;
+		case R.id.qrcode_saveto_album:
+			new SaveQRCodeTask().execute();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
 }
