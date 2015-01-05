@@ -123,6 +123,11 @@ public class MyQRCode extends ActionBarActivity{
 			R.anim.slide_right_out);
 	}
 	
+	/**
+	 * save qr_code asyntask
+	 * @author luo-PC
+	 *
+	 */
 	private class SaveQRCodeTask extends AsyncTask<Object, Object, Boolean>
 	{
 		@Override
